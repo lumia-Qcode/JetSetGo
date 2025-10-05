@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Budget{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>💰 Budget for {{ trip.title }}</h2>
+    <p><b>Destination:</b> {{ trip.destination }}</p>
+    <p><b>Dates:</b> {{ trip.start_date }} → {{ trip.end_date }}</p>
+    <hr>
+
+    <!-- Summary -->
+    <div class="card p-3 mb-3">
+        <p>
+            <b>Total Planned:</b> {{ trip.budget.total_planned }} |
+            <b>Total Spent:</b> {{ trip.budget.total_spent }} |
+            <b>Remaining:</b> {{ trip.budget.calculate_remaining() }}
+        </p>
+    </div>
+
+    <!-- Expenses -->
+    <h3>Expenses</h3>
+    {% if trip.budget.expenses|length == 0 %}
+        <p class="text-muted">No expenses yet.</p>
+    {% else %}
+        <ul class="list-group mb-3">
+          {% for expense in trip.budget.expenses %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div>
+                <b>{{ expense.description }}</b> - ${{ expense.amount }}
+                {% if expense.shared_with %}
+                  <p class="mb-1">
+                    Shared with: {{ expense.shared_with }} ({{ expense.status }})
+                  </p>
+
+                  {% if expense.status == "Pending" and expense.shared_with == session['user_name'] %}
+                    <form action="{{ url_for('trips.respond_share', expense_id=expense.id, response='accept') }}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-success btn-sm">Accept</button>
+                    </form>
+                    <form action="{{ url_for('trips.respond_share', expense_id=expense.id, response='reject') }}" method="post" class="d-inline">
+                      <button type="submit" class="btn btn-warning btn-sm">Reject</button>
+                    </form>
+                  {% endif %}
+                {% endif %}
+              </div>
+              <div>
+                <!-- Edit button -->
+                <form action="{{ url_for('trips.edit_expense', expense_id=expense.id) }}" method="POST" class="d-inline">
+                    <input type="hidden" name="amount" value="{{ expense.amount }}">
+                    <input type="hidden" name="description" value="{{ expense.description }}">
+                    <input type="hidden" name="shared_with" value="{{ expense.shared_with }}">
+                    <button type="submit" class="btn btn-primary btn-sm">Edit</button>
+                </form>
+
+                <!-- Delete button -->
+                <form action="{{ url_for('trips.delete_expense', expense_id=expense.id) }}" method="POST"
+                      onsubmit="return confirm('Delete this expense?');" class="d-inline">
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Add Expense -->
+    <div class="card p-3">
+        <h5>Add Expense</h5>
+        <form action="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" method="POST" class="mb-4">
+            <input type="number" name="amount" step="0.01" placeholder="Amount" required class="form-control mb-2">
+            <input type="text" name="category" placeholder="Category" class="form-control mb-2">
+            <input type="text" name="description" placeholder="Description" class="form-control mb-2">
+            <input type="text" name="shared_with" placeholder="Shared with (comma-separated)" class="form-control mb-2">
+            <button type="submit" class="btn btn-success">Add Expense</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

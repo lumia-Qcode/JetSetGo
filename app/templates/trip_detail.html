@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Trip Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Trip Info -->
+    <h2>{{ trip.title }} 🌍</h2>
+    <p><b>Destination:</b> {{ trip.destination }}</p>
+    <p><b>Dates:</b> {{ trip.start_date }} → {{ trip.end_date }}</p>
+    <p><b>Description:</b> {{ trip.description or "No description" }}</p>
+    <hr>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Share Trip -->
+    <h5>👥 Share Trip</h5>
+    <form action="{{ url_for('trips.share_trip', trip_id=trip.id) }}" method="POST" class="d-flex mb-3">
+        <input type="text" name="username" placeholder="Friend username" required class="form-control me-2">
+        <button class="btn btn-info">Share</button>
+    </form>
+
+    {% if trip.participants %}
+        <p><b>Shared with:</b> 
+            {% for u in trip.participants %}
+                {{ u.username }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+    {% endif %}
+    <hr>
+
+    <!-- Itinerary -->
+    <h3>🗓️ Itinerary</h3>
+    {% if trip.itinerary|length == 0 %}
+        <p class="text-muted">No itinerary items yet.</p>
+    {% else %}
+        <ul class="list-group mb-3">
+            {% for item in trip.itinerary %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <b>{{ item.title }}</b> ({{ item.date }})<br>
+                        {{ item.location or "No location" }} | {{ item.notes or "" }}
+                    </div>
+                    <form action="{{ url_for('trips.delete_itinerary', item_id=item.id) }}" method="POST" class="d-inline"
+                          onsubmit="return confirm('Delete this itinerary item?');">
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <!-- Add Itinerary -->
+    <form action="{{ url_for('trips.add_itinerary', trip_id=trip.id) }}" method="POST" class="mb-4">
+        <h5>Add Itinerary Item</h5>
+        <input type="text" name="title" placeholder="Title" required class="form-control mb-2">
+        <input type="date" name="date" required class="form-control mb-2">
+        <input type="text" name="location" placeholder="Location" class="form-control mb-2">
+        <textarea name="notes" placeholder="Notes" class="form-control mb-2"></textarea>
+        <button type="submit" class="btn btn-success">Add Item</button>
+    </form>
+
+    <hr>
+
+    <!-- Budget Section -->
+    <h3>💰 Budget</h3>
+    {% if not trip.budget %}
+        <p class="text-muted">No budget yet. Go to <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}">Budget Page</a>.</p>
+    {% else %}
+        <p>
+            <b>Total Planned:</b> {{ trip.budget.total_planned }} |
+            <b>Total Spent:</b> {{ trip.budget.total_spent }} |
+            <b>Remaining:</b> {{ trip.budget.calculate_remaining() }}
+        </p>
+        <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" class="btn btn-primary">📊 Manage Budget</a>
+    {% endif %}
+
+    <a href="{{ url_for('trips.view_trips') }}" class="btn btn-secondary mt-3">⬅ Back to Trips</a>
+</div>
+{% endblock %}

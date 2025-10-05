@@ -1,0 +1,531 @@
+/* ==== Reset & Base ==== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", "Poppins", sans-serif;
+}
+
+body {
+  background-color: #f3f0ff;
+  color: #444;
+  line-height: 1.6;
+}
+
+/* ==== Header & Nav ==== */
+header {
+  background-color: #a0c4ff;
+  color: #2c3e50; /* changed from white to dark charcoal */
+  padding: 20px 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+header .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+header h1 {
+  font-size: 2rem;
+  margin-left: 20px;
+  color: #2c3e50; /* ensure header text is dark */
+}
+
+nav a {
+  color: #34495e; /* darker blue-gray */
+  text-decoration: none;
+  margin: 0 15px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+nav a:hover {
+  color: #ffb5a7;
+}
+
+/* ==== Main Content ==== */
+.container {
+  max-width: 960px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #fff1e6;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+  color: #333; /* slightly darker text for main content */
+}
+
+/* ==== Footer ==== */
+footer {
+  background-color: #cbaacb;
+  color: #2c3e50; /* changed from white to dark charcoal */
+  text-align: center;
+  padding: 15px;
+  margin-top: 60px;
+  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
+  font-weight: 500;
+}
+
+/* ==== Buttons ==== */
+.btn, .btn-small {
+  background-color: #cbaacb;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-small {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+.btn:hover, .btn-small:hover {
+  background-color: #ffb5a7;
+}
+
+.btn-clear {
+  background-color: #ffb5a7;
+  color: white;
+}
+
+.btn-clear:hover {
+  background-color: #f08080;
+}
+
+/* ==== Task Table ==== */
+.task-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 25px;
+  font-size: 0.95rem;
+  color: #2c3e50; /* dark charcoal text for table */
+}
+
+.task-table th, .task-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+  vertical-align: middle;
+}
+
+.task-table th {
+  background-color: #a0c4ff;
+  color: #2c3e50; /* dark text instead of white */
+  font-weight: 600;
+}
+
+.task-table tr:nth-child(even) {
+  background-color: #f3f0ff;
+}
+
+.task-table tr:hover {
+  background-color: #ffb5a7;
+  color: white;
+}
+
+/* ==== Badge Styles ==== */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.badge.done {
+  background-color: #b7e4c7;
+  color: #1b4332;
+}
+
+.badge.pending {
+  background-color: #ffd6a5;
+  color: #8b5d33;
+}
+
+.badge.working {
+  background-color: #ffd6a5;
+  color: #8b5d33;
+}
+
+/* ==== Flash Messages ==== */
+.flash {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.flash.success {
+  background-color: #b7e4c7;
+  color: #1b4332;
+}
+
+.flash.error {
+  background-color: #ffadad;
+  color: #6b0000;
+}
+
+/* ==== Forms ==== */
+.task-form, .login-box form, .form-group {
+  margin-top: 20px;
+}
+
+input[type="text"], input[type="password"], input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #2c3e50; /* dark label text */
+}
+
+/* ==== Login & Register ==== */
+.login-box {
+  background-color: #e7c6ff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  color: #4c0070;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #a0c4ff;
+  box-shadow: 0 0 5px rgba(160, 196, 255, 0.5);
+}
+
+.trash-btn {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    line-height: 1;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Smaller icon (16x16) and white/grey color */
+.trash-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: #d3d3d3; /* Light grey, or use #ffffff for white */
+    vertical-align: middle;
+}
+
+/* Optional: Change icon on hover (e.g., slightly darker grey or red) */
+.trash-btn:hover svg {
+    fill: #ff4c4c; /* light red on hover */
+    transform: scale(1.1);
+}
+
+/* ==== Responsive ==== */
+@media (max-width: 768px) {
+  header .container, footer .container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  nav a {
+    margin: 10px 5px;
+  }
+}
+
+/* Style date and time inputs in the task form */
+.task-form input[type="date"],
+.task-form input[type="time"] {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: "Segoe UI", "Poppins", sans-serif;
+  color: #444;
+  background-color: white;
+  min-width: 150px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline-offset: 2px;
+  outline-color: #a0c4ff;
+}
+
+.task-form input[type="date"]:focus,
+.task-form input[type="time"]:focus {
+  border-color: #a0c4ff;
+  box-shadow: 0 0 5px rgba(160, 196, 255, 0.6);
+}
+
+/* Responsive: stack inputs vertically on small screens */
+@media (max-width: 480px) {
+  .task-form input[type="date"],
+  .task-form input[type="time"] {
+    margin-left: 0;
+    margin-top: 10px;
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input[type="password"],
+.password-wrapper input[type="text"] {
+  width: 100%;
+  padding-right: 35px; /* Space for the icon */
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.1em;
+  user-select: none;
+}
+
+.about-card {
+  background-color: #fff1e6;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  max-width: 800px;
+  margin: 40px auto;
+  color: #2c3e50;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.about-card h2 {
+  margin-bottom: 20px;
+  font-size: 2rem;
+  color: #4c0070;
+  text-align: center;
+}
+
+.about-card h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: #6a0572;
+}
+
+.about-card ul {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.about-card ul li {
+  margin-bottom: 10px;
+}
+
+
+/*--------------------------*/
+/* logo styling */
+.logo {
+  max-width: 150px;
+  display: block;
+  margin: 0 0 0.8rem 0; 
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.8rem;
+  margin: 2.5rem 0;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.6rem;
+  text-align: left;
+  text-decoration: none;
+  color: #222;
+
+  /* modern subtle shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+  color: #6c63ff; /* muted accent color */
+}
+
+.card h3 {
+  margin: 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.card p {
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #666;
+}
+
+/*----------------------------*/
+
+/* ==== Trips Page ==== */
+.trip-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.trip-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.4rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.trip-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+}
+
+.trip-card h5 {
+  font-size: 1.2rem;
+  margin-bottom: 0.2rem;
+  color: #4c0070;
+}
+
+.trip-card h6 {
+  color: #6a0572;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.trip-card p {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+/* Badge override */
+.trip-card .badge {
+  margin-top: 8px;
+  display: inline-block;
+  background-color: #a0c4ff;
+  color: #2c3e50;
+  font-size: 0.75rem;
+  padding: 5px 8px;
+  border-radius: 6px;
+}
+
+/* Buttons inside cards */
+.trip-card .btn-sm {
+  margin-right: 6px;
+}
+
+/* ==== Trip Detail ==== */
+.trip-detail h2 {
+  font-size: 1.8rem;
+  color: #4c0070;
+  margin-bottom: 0.5rem;
+}
+
+.trip-detail p {
+  font-size: 1rem;
+  margin-bottom: 0.6rem;
+  color: #333;
+}
+
+/* Section titles */
+.trip-detail h3 {
+  font-size: 1.4rem;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  color: #6a0572;
+}
+
+/* Itinerary list */
+.itinerary-list .list-group-item {
+  border-radius: 8px;
+  margin-bottom: 6px;
+  border: 1px solid #eee;
+}
+
+.itinerary-list .btn-sm {
+  padding: 4px 10px;
+  font-size: 0.85rem;
+}
+
+/* ==== Budget Page ==== */
+.budget-summary {
+  background-color: #e7c6ff;
+  padding: 1rem;
+  border-radius: 10px;
+  font-weight: 500;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.budget-summary p {
+  margin: 0.2rem 0;
+  font-size: 1rem;
+}
+
+/* Expenses list */
+.expense-list .list-group-item {
+  border-radius: 8px;
+  border: 1px solid #eee;
+  margin-bottom: 8px;
+}
+
+.expense-list b {
+  color: #4c0070;
+}
+
+/* Shared-with text */
+.expense-list p {
+  font-size: 0.85rem;
+  margin-top: 4px;
+  color: #555;
+}
+
+/* Add expense form */
+.add-expense-form {
+  background-color: #fff1e6;
+  padding: 1.2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.add-expense-form h5 {
+  margin-bottom: 0.8rem;
+  color: #6a0572;
+}
+
+
+
