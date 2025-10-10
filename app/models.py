@@ -1,14 +1,17 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
-from sqlalchemy.dialects.sqlite import JSON
 
-# Association table (no class, just a raw table)
-trip_users = db.Table(
+#==========================================================================================================
+
+# Association table (Many to Many) between Users and Trips
+trip_users = db.Table(      # This creates a join table (no model class needed) linking users and trips
     "trip_users",
     db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True),
     db.Column("trip_id", db.Integer, db.ForeignKey("trip.id"), primary_key=True)
 )
+
+#==========================================================================================================
 
 class User(db.Model):
     # Attributes
@@ -17,7 +20,6 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable = False)
     email = db.Column(db.String(100), unique = True, nullable = False)
     password = db.Column(db.String(200), nullable = False)
-
 
     # Functions
     @classmethod
@@ -38,20 +40,21 @@ class User(db.Model):
             return user
         return None
     
-    def login(self):    
+    def login(self):        # Log in this user in session
         session['user_id'] = self.id
         session['user_email'] = self.email
         session['user_name'] = self.username
 
     @staticmethod
-    def logout():
+    def logout():           # Log out current user from session
         session.pop('user_id', None)
         session.pop('user_name', 'None')
         session.pop('user_email', 'None')
 
-    def __repr__(self):
+    def __repr__(self):     # Returns a readable string representation of the User object for debugging
         return f"<User {self.username}>"
 
+#==========================================================================================================
 
 class Task(db.Model):
     # Attributes
@@ -85,49 +88,62 @@ class Task(db.Model):
         db.session.commit()
 
     @classmethod
-    def clear_user_tasks(cls, user_id): # Delete all Tasks of this User
+    def clear_user_tasks(cls, user_id):     # Delete all Tasks of this User
         cls.query.filter_by(user_id = user_id).delete()
         db.session.commit()
 
+#==========================================================================================================
 
 class Trip(db.Model):
     # Attributes
     __tablename__ = "trip"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    destination = db.Column(db.String(150), nullable=False)
     start_date = db.Column(db.Date, nullable=False)
     end_date = db.Column(db.Date, nullable=False)
     description = db.Column(db.Text, nullable=True)
+    destinations = db.relationship(
+        "TripDestination",
+        backref="trip",
+        cascade="all, delete-orphan",
+        lazy=True
+    )
 
     # Relationships
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     itinerary = db.relationship("ItineraryItem", backref="trip", lazy=True, cascade="all, delete-orphan")
     budget = db.relationship("Budget", backref="trip", uselist=False, cascade="all, delete-orphan")
     participants = db.relationship("User", secondary=trip_users, backref=db.backref("trips", lazy="dynamic"))
 
     # Functions 
-
     @classmethod
-    def create(cls, title, destination, start_date, end_date, description, user_id):
+    def create(cls, title, destinations, start_date, end_date, description, participant):   # Create New Trip
+
         trip = cls(
             title=title,
-            destination=destination,
             start_date=start_date,
             end_date=end_date,
-            description=description,
-            user_id=user_id
+            description=description
         )
         db.session.add(trip)
+        db.session.flush()      # Get trip.id before commit
+
+        for dest in destinations:       # Split by comma and add each destination
+            if dest.strip():
+                trip.destinations.append(TripDestination(name=dest.strip()))
+
+        trip.participants.append(participant)   # Add the user as a participant of this tri[]
         db.session.commit()
         return trip
     
-    def update_details(self, title=None, destination=None, start_date=None, end_date=None, description=None):
-        """Update trip details."""
+    def update_details(self, title=None, destinations=None, start_date=None, end_date=None, description=None):
+        # Update trip details
         if title: 
             self.title = title
-        if destination: 
-            self.destination = destination
+        if destinations:
+            self.destinations = []
+            for dest in destinations:       # Split by comma and add each destination
+                if dest.strip():
+                    self.destinations.append(TripDestination(name=dest.strip()))
         if start_date: 
             self.start_date = start_date
         if end_date: 
@@ -138,21 +154,20 @@ class Trip(db.Model):
         db.session.commit()
         return self
 
-
-    def add_itinerary_item(self, title, date, location=None, notes=None):
+    def add_itinerary_item(self, title, date, location=None, notes=None):   # Add new itinerary item
         item = ItineraryItem(title=title, date=date, location=location, notes=notes, trip_id=self.id)
         db.session.add(item)
         db.session.commit()
         return item
 
-    def init_budget(self, category="General"):
+    def init_budget(self, category="General"):   # Initialize budget if none exists
         if not self.budget:
             budget = Budget(total_planned=0.0, total_spent=0.0, category=category, trip_id=self.id)
             db.session.add(budget)
             db.session.commit()
         return self.budget
 
-    def add_expense(self, amount, category, description, shared_with=None):
+    def add_expense(self, amount, category, description, shared_with=None):     # Add new expense to budget, create budget if none exists
         if not self.budget:
             self.init_budget(category=category)
 
@@ -167,23 +182,22 @@ class Trip(db.Model):
         db.session.commit()
         return expense
 
-    def share_with(self, user):
-        """Add user to trip participants"""
+    def share_with(self, user):     # Share this trip with another user
         if user not in self.participants:
-            self.participants.append(user)
+            self.participants.append(user)      # Add friend(user) as participant
             db.session.commit()
 
-    def remove_participant(self, user):
+    def remove_participant(self, user):     # Remove a participant from this trip
         if user in self.participants:
             self.participants.remove(user)
-            if not self.participants:  # no one left
+            if not self.participants:   # If no participants left, delete the trip from database
                 db.session.delete(self)
             db.session.commit()
 
-    def is_participant(self, user):
-        return user in self.participants
+    def get_participant_ids(self):   # Return list of user IDs participating in this trip
+        return [user.id for user in self.participants]
     
-    def delete_trip(self):
+    def delete_trip(self):      # Delete this trip and all related data (Composition)
         # Delete itinerary items
         for item in self.itinerary:
             db.session.delete(item)
@@ -198,16 +212,31 @@ class Trip(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def delete_all_trips(self):
-        """Delete all trips and their related data for this user."""
+    def delete_all_trips(self):   # Delete all trips of the user
         for trip in self.trips:
-            trip.delete_trip()  # uses Trip.delete_trip to clean itinerary, budget, expenses
-
+            trip.delete_trip()  
         db.session.commit()
 
-    def __repr__(self):
-        return f"<Trip {self.title} to {self.destination}>"
+    def add_destination(self, name: str):   # Encapsulated method to add a destination
+        self.destinations.append(TripDestination(name=name))
 
+    def __repr__(self):
+        return f"<Trip {self.title}>"
+
+#==========================================================================================================
+
+class TripDestination(db.Model):
+    # Attributes
+    __tablename__ = "trip_destination"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), nullable=False)
+    trip_id = db.Column(db.Integer, db.ForeignKey("trip.id"), nullable=False)
+
+    
+    def __repr__(self):
+        return f"<Destination {self.name}>"
+
+#==========================================================================================================
 
 class ItineraryItem(db.Model):
     # Attributes
@@ -222,8 +251,7 @@ class ItineraryItem(db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey("trip.id"), nullable=False)
 
     # Functions
-
-    def update(self, title=None, date=None, location=None, notes=None):
+    def update(self, title=None, date=None, location=None, notes=None):     # Update itinerary item details
         if title: self.title = title
         if date: self.date = date
         if location: self.location = location
@@ -231,13 +259,14 @@ class ItineraryItem(db.Model):
         db.session.commit()
         return self
 
-    def delete(self):
+    def delete(self):       # Delete this itinerary item
         db.session.delete(self)
         db.session.commit()
 
     def __repr__(self):
-        return f"<ItineraryItem {self.title} on {self.date}>"
+        return f"<ItineraryItem {self.title}>"
 
+#==========================================================================================================
 
 class Budget(db.Model):
     # Attributes
@@ -259,11 +288,13 @@ class Budget(db.Model):
         db.session.commit()
         return expense
 
-    def calculate_remaining(self):
+    def calculate_remaining(self):  # Return remaining balance in budget
         return self.total_planned - self.total_spent
     
     def __repr__(self):
         return f"<Budget Planned={self.total_planned}, Spent={self.total_spent}>"
+
+#==========================================================================================================
 
 class Expense(db.Model):
     # Attributes
@@ -278,8 +309,7 @@ class Expense(db.Model):
     budget_id = db.Column(db.Integer, db.ForeignKey("budget.id"), nullable=False)
 
     # Functions
-    def update_details(self, amount=None, description=None, shared_with=None):
-        """Update an expense details."""
+    def update_details(self, amount=None, description=None, shared_with=None):   # Update this expense details
         if amount is not None:
             self.amount = float(amount)
         if description is not None:
@@ -290,18 +320,17 @@ class Expense(db.Model):
         db.session.commit()
         return self
 
-    def delete_expense(self):
-        """Delete this expense from DB."""
+    def delete_expense(self):   # Delete this expense
         db.session.delete(self)
         db.session.commit()
 
-    def split_with(self, usernames):
+    def split_with(self, usernames):    # Share this expense with other users(friends)
         self.shared_with = ",".join(usernames)
         self.status = "Pending"
         db.session.commit()
         return self
 
-    def update_status(self, response):
+    def update_status(self, response):  # Update status of shared expense (Accepted / Rejected)
         self.status = response
         if response == "Rejected":
             self.shared_with = None
@@ -311,43 +340,48 @@ class Expense(db.Model):
     def __repr__(self):
         return f"<Expense {self.amount} - {self.description}>"
     
+#==========================================================================================================
 
-class NotificationService:
-    """Abstract parent class for all notifications."""
+# <......WE NEED TO FIX THIS NOTIFICATION CLASS AND ITS INHERITORS LATER......>
 
-    def __init__(self, sender, receiver, message):
-        self.sender = sender
-        self.receiver = receiver
-        self.message = message
-        self.status = "Pending"  # default for all notifications
+# class NotificationService:
+#     """Abstract parent class for all notifications."""
 
-    def send(self):
-        raise NotImplementedError("Subclasses must implement this method")
+#     def __init__(self, sender, receiver, message):
+#         self.sender = sender
+#         self.receiver = receiver
+#         self.message = message
+#         self.status = "Pending"  # default for all notifications
 
-    def respond(self, response):
-        """Accept / Reject / Mark as Read."""
-        self.status = response
-        return self.status
+#     def send(self):
+#         raise NotImplementedError("Subclasses must implement this method")
+
+#     def respond(self, response):
+#         """Accept / Reject / Mark as Read."""
+#         self.status = response
+#         return self.status
     
+#==========================================================================================================
 
-class ExpenseShareNotification(NotificationService):
-    def __init__(self, sender, receiver, expense):
-        message = f"{sender.username} wants to share expense '{expense.description}' with you."
-        super().__init__(sender, receiver, message)
-        self.expense = expense
+# class ExpenseShareNotification(NotificationService):
+#     def __init__(self, sender, receiver, expense):
+#         message = f"{sender.username} wants to share expense '{expense.description}' with you."
+#         super().__init__(sender, receiver, message)
+#         self.expense = expense
 
-    def send(self):
-        # Logic to store in DB or notify user
-        print(f"Notification sent to {self.receiver.username}: {self.message}")
+#     def send(self):
+#         # Logic to store in DB or notify user
+#         print(f"Notification sent to {self.receiver.username}: {self.message}")
 
+#==========================================================================================================
 
-class TripShareNotification(NotificationService):
-    def __init__(self, sender, receiver, trip):
-        message = f"{sender.username} wants to share trip '{trip.title}' with you."
-        super().__init__(sender, receiver, message)
-        self.trip = trip
+# class TripShareNotification(NotificationService):
+#     def __init__(self, sender, receiver, trip):
+#         message = f"{sender.username} wants to share trip '{trip.title}' with you."
+#         super().__init__(sender, receiver, message)
+#         self.trip = trip
 
-    def send(self):
-        # 🔹 For now just print, but you can later extend to DB storage
-        print(f"Notification sent to {self.receiver.username}: {self.message}")
-        # e.g. save to Notification table if you want persistence
+#     def send(self):
+#         # 🔹 For now just print, but you can later extend to DB storage
+#         print(f"Notification sent to {self.receiver.username}: {self.message}")
+#         # e.g. save to Notification table if you want persistence

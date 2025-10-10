@@ -5,8 +5,12 @@
 <div class="container mt-4">
     <!-- Trip Info -->
     <h2>{{ trip.title }} 🌍</h2>
-    <p><b>Destination:</b> {{ trip.destination }}</p>
-    <p><b>Dates:</b> {{ trip.start_date }} → {{ trip.end_date }}</p>
+    <p><b>Destination:</b>             
+                {% for d in trip.destinations %}
+                    {{ d.name }}
+                {% endfor %}
+    </p>
+    <p><b>Dates:</b> {{ trip.start_date }} - {{ trip.end_date }}</p>
     <p><b>Description:</b> {{ trip.description or "No description" }}</p>
     <hr>
 
@@ -29,13 +33,18 @@
         <button class="btn btn-info">Share</button>
     </form>
 
-    {% if trip.participants %}
+
+    {% set participant_ids = trip.participants | map(attribute='id') | list %}
         <p><b>Shared with:</b> 
-            {% for u in trip.participants %}
-                {{ u.username }}{% if not loop.last %}, {% endif %}
-            {% endfor %}
+            {% if participant_ids|length == 1 and session['user_id'] in participant_ids %}
+            You (Solo Trip)
+            {% else %}
+                {% for u in trip.participants %}
+                    {% if u.id == session['user_id'] %}(You){% endif %}
+                    {{ u.username }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            {% endif %}
         </p>
-    {% endif %}
     <hr>
 
     <!-- Itinerary -->
@@ -50,10 +59,14 @@
                         <b>{{ item.title }}</b> ({{ item.date }})<br>
                         {{ item.location or "No location" }} | {{ item.notes or "" }}
                     </div>
+                    
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('trips.edit_itinerary', item_id=item.id) }}" class="btn btn-secondary btn-sm">Edit</a>
                     <form action="{{ url_for('trips.delete_itinerary', item_id=item.id) }}" method="POST" class="d-inline"
                           onsubmit="return confirm('Delete this itinerary item?');">
                         <button class="btn btn-danger btn-sm">Delete</button>
                     </form>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -83,7 +96,9 @@
         </p>
         <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" class="btn btn-primary">📊 Manage Budget</a>
     {% endif %}
+</div>
 
+<div class="text-end mb-3">
     <a href="{{ url_for('trips.view_trips') }}" class="btn btn-secondary mt-3">⬅ Back to Trips</a>
 </div>
 {% endblock %}

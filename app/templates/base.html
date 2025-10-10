@@ -12,11 +12,11 @@
             <nav>
                 <a href="{{ url_for('view.home') }}">Home</a>
                 <a href="{{ url_for('main.about') }}">About Us</a>
-                {% if 'user_id' in session and 'user_email' in session%}
+                {% if 'user_id' in session and 'user_email' in session %}    
                     <a href="{{ url_for('auth.logout') }}">Logout</a>
                 {% else %}
                     <a href="{{ url_for('auth.login') }}">Login</a>
-                {% endif%}
+                {% endif %}
                 <a href="{{ url_for('auth.register') }}">Register</a>
             </nav>
         </div>
@@ -24,7 +24,7 @@
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories = True) %}
-            {% for category, message in messages%}
+            {% for category, message in messages %}
                  <div class="flash {{category}}">{{ message }}</div>
             {% endfor %}
         {% endwith %}

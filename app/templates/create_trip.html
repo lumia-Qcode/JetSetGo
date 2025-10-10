@@ -6,7 +6,7 @@
     <h3 class="mb-3 text-center">✈️ Create New Trip</h3>
     <form method="POST" action="{{ url_for('trips.create_trip') }}">
       <input type="text" name="title" placeholder="Trip Title" required class="form-control mb-3">
-      <input type="text" name="destination" placeholder="Destination" required class="form-control mb-3">
+      <input type="text" name="destinations" placeholder="Enter destinations (comma-separated)" required class="form-control mb-3">
       <label>Start Date</label>
       <input type="date" name="start_date" required class="form-control mb-3">
       <label>End Date</label>

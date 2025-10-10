@@ -74,4 +74,13 @@
         </form>
     </div>
 </div>
+<!---Make a pie chart-->
+<!---Export csv file code-->
+<!-- Back to Trip Detail -->
+  <div class="text-end mb-3">
+    <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn btn-outline-secondary">
+        ← Back to Trip Details
+    </a>
+  </div>
+
 {% endblock %}
