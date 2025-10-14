@@ -295,13 +295,14 @@ def edit_expense(expense_id):
     amount = request.form.get("amount")
     description = request.form.get("description")
     shared_with = request.form.get("shared_with")
+    category = request.form.get("category")
 
     if not amount or float(amount) <= 0:   # Basic validation
         flash("Invalid expense amount", "danger")
         return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
     
     # Update expense details using instance method
-    expense.update_details(amount=amount, description=description, shared_with=shared_with)
+    expense.update_details(amount=amount, description=description, shared_with=shared_with, category=category)
 
     flash("Expense updated successfully!", "success")
     return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))

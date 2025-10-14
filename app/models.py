@@ -160,24 +160,25 @@ class Trip(db.Model):
         db.session.commit()
         return item
 
-    def init_budget(self, category="General"):   # Initialize budget if none exists
+    def init_budget(self):   # Initialize budget if none exists
         if not self.budget:
-            budget = Budget(total_planned=0.0, total_spent=0.0, category=category, trip_id=self.id)
+            budget = Budget(total_planned=0.0, total_spent=0.0, trip_id=self.id)
             db.session.add(budget)
             db.session.commit()
         return self.budget
 
     def add_expense(self, amount, category, description, shared_with=None):     # Add new expense to budget, create budget if none exists
         if not self.budget:
-            self.init_budget(category=category)
+            self.init_budget()
 
         expense = Expense(
             amount=amount,
             description=description,
             shared_with=",".join(shared_with) if shared_with else None,
-            budget_id=self.budget.id
+            budget_id=self.budget.id,
+            category=category
         )
-        self.budget.total_spent += amount
+        self.budget.total_spent += amount  
         db.session.add(expense)
         db.session.commit()
         return expense
@@ -274,7 +275,6 @@ class Budget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     total_planned = db.Column(db.Float, default=0.0)
     total_spent = db.Column(db.Float, default=0.0)
-    category = db.Column(db.String(50), nullable=False) 
 
     # Relationships
     trip_id = db.Column(db.Integer, db.ForeignKey("trip.id"), nullable=False)
@@ -303,19 +303,22 @@ class Expense(db.Model):
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
     shared_with = db.Column(db.String(200))
+    category = db.Column(db.String(50), default="General") 
     status = db.Column(db.String(20), default="Unshared")  # Unshared, Shared, Accepted, Rejected 
 
     # Relationships
     budget_id = db.Column(db.Integer, db.ForeignKey("budget.id"), nullable=False)
 
     # Functions
-    def update_details(self, amount=None, description=None, shared_with=None):   # Update this expense details
+    def update_details(self, amount=None, description=None, shared_with=None, category=None):   # Update this expense details
         if amount is not None:
             self.amount = float(amount)
         if description is not None:
             self.description = description
         if shared_with is not None:
             self.shared_with = shared_with
+        if category is not None:
+            self.category = category
 
         db.session.commit()
         return self
