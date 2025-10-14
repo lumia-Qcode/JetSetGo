@@ -95,4 +95,136 @@
     </a>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+
+<!-- Server-rendered expenses as JSON to avoid embedding Jinja in JS -->
+<script id="expenses-data" type="application/json"
+    data-trip-title="{{ trip.title|e }}"
+    data-total-spent="{{ trip.budget.total_spent|default(0) }}"
+    data-remaining="{{ trip.budget.calculate_remaining()|default(0) }}">
+[
+{%- for e in trip.budget.expenses %}
+    {{ ({'description': e.description|default(''), 'amount': (e.amount|default(0)), 'category': e.category|default('')})|tojson }}{{ "," if not loop.last else "" }}
+{%- endfor %}
+]
+</script>
+
+<script>
+var categoryData = {};
+var expenses = [];
+
+// Populate categoryData and expenses from server-rendered JSON
+var _dataEl = document.getElementById('expenses-data');
+if (_dataEl) {
+    try {
+        var serverExpenses = JSON.parse(_dataEl.textContent) || [];
+        serverExpenses.forEach(function(expense) {
+            var category = expense.category || 'Uncategorized';
+            var amount = Number(expense.amount) || 0;
+            categoryData[category] = (categoryData[category] || 0) + amount;
+            expenses.push({
+                description: expense.description || '',
+                amount: amount,
+                category: expense.category || ''
+            });
+        });
+    } catch (err) {
+        console.error('Failed to parse expenses JSON', err);
+    }
+}
+
+var labels = Object.keys(categoryData);
+var data = Object.values(categoryData);
+//*************************alizeh************************
+// Create the pie chart. Chart size is reduced by smaller canvas dimensions
+// and disabling maintainAspectRatio so Chart.js will use the canvas size.
+var ctx = document.getElementById('budgetChart').getContext('2d');
+var budgetChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: labels,
+        datasets: [{
+            data: data,
+            backgroundColor: [
+                '#FF6384',
+                '#36A2EB',
+                '#FFCE56',
+                '#4BC0C0',
+                '#9966FF',
+                '#FF9F40'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        // Let the chart fill the (smaller) canvas rather than enforcing original aspect ratio
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false,
+            }
+        }
+    },
+});
+
+var total = data.reduce((a, b) => a + b, 0);
+var legendHtml = '<div class="d-flex flex-wrap justify-content-center mt-3">';
+labels.forEach(function(label, index) {
+    var percentage = ((data[index] / total) * 100).toFixed(1);
+    var color = budgetChart.data.datasets[0].backgroundColor[index];
+    legendHtml += `
+        <div class="m-2 d-flex align-items-center">
+            <div style="width:15px;height:15px;background-color:${color};
+                        margin-right:6px;border-radius:3px;"></div>
+            <span><b>${label}</b>: ${percentage}%</span>
+        </div>`;
+});
+legendHtml += '</div>';
+
+// Insert below the chart
+var legendContainer = document.createElement('div');
+legendContainer.innerHTML = legendHtml;
+document.getElementById('budgetChart').parentNode.appendChild(legendContainer);
+
+//*************************alizeh************************
+// exportCSV() explanation:
+// - Uses the `expenses` array populated from the server-rendered JSON in
+//   the <script id="expenses-data"> tag. This avoids embedding Jinja inside
+//   JavaScript loops and prevents errors when fields contain quotes/newlines.
+// - Builds a simple CSV with a small header (report title and date range),
+//   a Summary section and an Expenses section. Fields are concatenated with
+//   commas; if you need robust CSV escaping for fields that can contain
+//   commas/quotes/newlines, consider adding a CSV-escape helper that wraps
+//   fields in double-quotes and doubles internal quotes.
+// - The current filename uses the server-side trip title; for stricter
+//   safety you can URL-encode or sanitize the filename (replace spaces, remove
+//   special chars). See the alternative implementation I can add if you'd
+//   like automatic filename sanitization and safer CSV escaping.
+function exportCSV() {
+    var csv = 'Budget Report - {{ trip.title }}\n';
+    csv += 'Date Range: {{ trip.start_date }} to {{ trip.end_date }}\n\n';
+    csv += 'Summary\n';
+    csv += 'Total Planned,{{ trip.budget.total_planned }}\n';
+    csv += 'Total Spent,{{ trip.budget.total_spent }}\n';
+    csv += 'Remaining,{{ trip.budget.calculate_remaining() }}\n\n';
+    csv += 'Expenses\n';
+    csv += 'Description,Amount,Category\n';
+    
+    expenses.forEach(function(expense) {
+        // Note: this simple concatenation assumes fields do not contain commas or quotes.
+        csv += (expense.description || '') + ',' + (expense.amount || '') + ',' + (expense.category || '') + '\n';
+    });
+    
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+    // Filename uses the trip title; consider sanitizing for production.
+    element.setAttribute('download', '{{ trip.title }}_budget.csv');
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+}
+</script>
+
 {% endblock %}
