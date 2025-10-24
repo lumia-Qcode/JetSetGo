@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session
-from app.models import Trip, ItineraryItem,  Expense, User
+from app.models import Trip, ItineraryItem,  Expense, User, PlannedBudget
 from werkzeug.security import check_password_hash
 from datetime import datetime
 
@@ -33,7 +33,7 @@ def create_trip():
         description = request.form.get("description")
 
         if not title or not destinations or not start_date or not end_date:  # Basic validation
-            flash("All required fields must be filled", "danger")
+            flash("All required fields must be filled", "info")
             return redirect(url_for("trips.create_trip"))
         
         
@@ -97,7 +97,7 @@ def share_trip(trip_id):
     trip = Trip.query.get_or_404(trip_id)       # Get trip by ID or return 404 if not found
     user_id = session.get("user_id")
     if not user_id:     # If user not logged in, redirect to login
-        flash("Please log in.", "warning")
+        flash("Please log in.", "info")
         return redirect(url_for("auth.login"))
 
     if user_id not in trip.get_participant_ids():  # Check if current user is a participant
@@ -142,7 +142,7 @@ def delete_trip(trip_id):
     user_id = session.get('user_id')
 
     if not user_id:     # If user not logged in, redirect to login
-        flash("You must be logged in to perform this action.", "danger")
+        flash("You must be logged in to perform this action.", "info")
         return redirect(url_for("auth.login"))
 
     user = User.query.get(session["user_id"])   # Current user attempting to delete the trip
@@ -168,7 +168,7 @@ def delete_user_trips(user_id):
     user_id = session.get('user_id')
 
     if not user_id:    # If user not logged in, redirect to login
-        flash("You must be logged in to perform this action.", "danger")
+        flash("You must be logged in to perform this action.", "info")
         return redirect(url_for("auth.login"))
 
     if request.method == "POST":        
@@ -199,16 +199,18 @@ def add_itinerary(trip_id):
     # Retrieve form data
     title = request.form.get("title")
     date = request.form.get("date")
+    time = request.form.get("time")
     location = request.form.get("location")
     notes = request.form.get("notes")
 
     if not title or not date:   # Basic validation
-        flash("Itinerary item must have a title and date", "danger")
+        flash("Itinerary item must have a title and date", "info")
         return redirect(url_for("trips.trip_detail", trip_id=trip_id))
     
     # Convert date string to date object
     date = datetime.strptime(date, "%Y-%m-%d").date()
-    trip.add_itinerary_item(title, date, location, notes)   # Call instance method to add itinerary item
+    time = datetime.strptime(time, "%H:%M:%S").time() if time else None
+    trip.add_itinerary_item(title, date, location, notes, time)   # Call instance method to add itinerary item
 
     flash("Itinerary item added!", "success")
     return redirect(url_for("trips.trip_detail", trip_id=trip_id))
@@ -221,21 +223,25 @@ def edit_itinerary(item_id):
     user_id = session.get("user_id")
 
     if user_id not in item.trip.get_participant_ids():  # Check if current user is a participant
-        flash("You do not have permission to edit this itinerary item.", "danger")
+        flash("You do not have permission to edit this itinerary item.", "info")
         return redirect(url_for("trips.trip_detail", trip_id=item.trip_id))
 
     if request.method == 'POST':
         # Retrieve form data
         title = request.form.get("title")
         date = request.form.get("date")
+        time = request.form.get("time")
         location = request.form.get("location")
         notes = request.form.get("notes")
 
         # Convert date string to date object, if user updated date
         if date:
             date = datetime.strptime(date, "%Y-%m-%d").date()
+        if time:
+            time = datetime.strptime(time, "%H:%M:%S").time()
 
-        item.update(title=title, date=date, location=location, notes=notes)  # Call instance method to update itinerary item
+         # Update itinerary item details using instance method
+        item.update(title=title, date=date, location=location, notes=notes, time=time)
         flash("Itinerary item updated!", "success")
         return redirect(url_for("trips.trip_detail", trip_id=item.trip_id))
     
@@ -284,28 +290,92 @@ def trip_budget(trip_id):
         return redirect(url_for("trips.trip_budget", trip_id=trip_id))
 
     return render_template("budget.html", trip=trip)
+#==========================================================================================================
+@trips_bp.route("/trip/<int:trip_id>/add_planned_budget", methods=["GET", "POST"])
+def add_planned_budget(trip_id):
+    trip = Trip.query.get_or_404(trip_id)   # Get trip by ID or return 404 if not found
+
+    if not trip.budget:     # If budget does not exist yet, initialize it
+        trip.init_budget()
+
+    # Retrieve form data
+    if request.method == "POST":
+        amount = float(request.form.get("amount"))
+        category = request.form.get("category")
+
+        if amount <= 0 or not category:   # Basic validation
+            flash("Invalid planned budget details", "danger")
+        else:
+            trip.budget.add_planned_budget(amount=amount, category=category)
+
+        flash("Planned budget added successfully!", "success")
+        return redirect(url_for("trips.trip_budget", trip_id=trip_id))
+    return render_template("budget.html", trip=trip)
+
+#==========================================================================================================
+@trips_bp.route("/update_planned_budget/<int:planned_budget_id>", methods=["GET", "POST"])
+def update_planned_budget(planned_budget_id):
+    planned_budget = PlannedBudget.query.get_or_404(planned_budget_id)  # Get planned budget by ID or return 404 if not found
+    trip = planned_budget.budget.trip
+    user_id = session.get("user_id")
+
+    if user_id not in trip.get_participant_ids():  # Check if current user is a participant
+        flash("You do not have permission to update this planned budget.", "danger")
+        return redirect(url_for("trips.trip_budget", trip_id=trip.id))
+
+    if request.method == "POST":
+        new_amount = float(request.form.get("amount"))
+        new_category = request.form.get("category")
+
+        if new_amount <= 0 or not new_category:   # Basic validation
+            flash("Invalid planned budget details", "danger")
+        else:
+            planned_budget.update_budget(new_amount=new_amount, new_category=new_category)
+
+        flash("Planned budget updated successfully!", "success")
+        return redirect(url_for("trips.trip_budget", trip_id=trip.id))
+    return render_template("edit_planned_budget.html", trip=trip, planned_budget=planned_budget)
+
+#==========================================================================================================
+@trips_bp.route("/delete_planned_budget/<int:planned_budget_id>", methods=["POST"])
+def delete_planned_budget(planned_budget_id):
+    planned_budget = PlannedBudget.query.get_or_404(planned_budget_id)  # Get planned budget by ID or return 404 if not found
+    trip = planned_budget.budget.trip
+    user_id = session.get("user_id")
+
+    if user_id not in trip.get_participant_ids():  # Check if current user is a participant
+        flash("You do not have permission to delete this planned budget.", "danger")
+        return redirect(url_for("trips.trip_budget", trip_id=trip.id))
+
+    # Delete the planned budget
+    planned_budget.delete_planned_budget()
+
+    flash("Planned budget deleted successfully!", "success")
+    return redirect(url_for("trips.trip_budget", trip_id=trip.id))
 
 #==========================================================================================================
 
-@trips_bp.route("/expense/<int:expense_id>/edit", methods=["POST"])
+@trips_bp.route("/expense/<int:expense_id>/edit", methods=["GET", "POST"])
 def edit_expense(expense_id):
     expense = Expense.query.get_or_404(expense_id)
-    
-    # Retreive form data
-    amount = request.form.get("amount")
-    description = request.form.get("description")
-    shared_with = request.form.get("shared_with")
-    category = request.form.get("category")
 
-    if not amount or float(amount) <= 0:   # Basic validation
-        flash("Invalid expense amount", "danger")
+    # Retrieve form data
+    if request.method == "POST":
+        amount = request.form.get("amount")
+        description = request.form.get("description")
+        shared_with = request.form.get("shared_with")
+        category = request.form.get("category")
+
+        if not amount or float(amount) <= 0:   # Basic validation
+            flash("Invalid expense amount", "danger")
+            return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
+    
+        # Update expense details using instance method
+        expense.update_details(amount=amount, description=description, shared_with=shared_with, category=category)
+
+        flash("Expense updated successfully!", "success")
         return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
-    
-    # Update expense details using instance method
-    expense.update_details(amount=amount, description=description, shared_with=shared_with, category=category)
-
-    flash("Expense updated successfully!", "success")
-    return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
+    return render_template("edit_expense.html", expense=expense)
 
 #==========================================================================================================
 

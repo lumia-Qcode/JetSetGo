@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Edit Expense{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>✏️ Edit Expense</h3>
+    <p class="text-muted">Trip: {{ expense.budget.trip.title }}</p>
+    <hr>
+
+    <form method="POST" class="card p-4 shadow-sm">
+        <!-- Amount -->
+        <div class="mb-3">
+            <label for="amount" class="form-label"><b>Amount ($)</b></label>
+            <input type="number" name="amount" id="amount" step="0.01" min="0"
+                   value="{{ expense.amount }}" required class="form-control">
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+            <label for="category" class="form-label"><b>Category</b></label>
+            <select name="category" id="category" class="form-select mb-2">
+                <option value="" disabled>-- Select a Category --</option>
+                {% set categories = ["Food", "Transport", "Accommodation", "Shopping", "Entertainment", "Miscellaneous"] %}
+                {% for cat in categories %}
+                    <option value="{{ cat }}" {% if expense.category == cat %}selected{% endif %}>{{ cat }}</option>
+                {% endfor %}
+            </select>
+
+            <input type="text" id="customCategory" class="form-control" placeholder="Or type a custom category"
+                   value="{% if expense.category not in categories %}{{ expense.category }}{% endif %}">
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+            <label for="description" class="form-label"><b>Description</b></label>
+            <input type="text" name="description" id="description"
+                   value="{{ expense.description }}" class="form-control">
+        </div>
+
+        <!-- Shared With -->
+        <div class="mb-3">
+            <label for="shared_with" class="form-label"><b>Shared With</b></label>
+            <input type="text" name="shared_with" id="shared_with"
+                   value="{{ expense.shared_with }}" class="form-control"
+                   placeholder="Comma-separated usernames (optional)">
+        </div>
+
+        <!-- Buttons -->
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Save Changes</button>
+            <a href="{{ url_for('trips.trip_budget', trip_id=expense.budget.trip.id) }}" 
+               class="btn btn-secondary ms-2">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<!-- JS: override category dropdown with custom input -->
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+    const custom = document.getElementById("customCategory").value.trim();
+    const select = document.getElementById("category");
+    if (custom) {
+        const opt = document.createElement("option");
+        opt.value = custom;
+        opt.text = custom;
+        opt.selected = true;
+        select.appendChild(opt);
+    }
+});
+</script>
+{% endblock %}

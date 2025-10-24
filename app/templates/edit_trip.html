@@ -11,7 +11,7 @@
         </div>
         <div class="mb-3">
             <label>Destination</label>
-            <input type="text" name="destinations" class="form-control" value="{{ trip.destinations | join(', ') }}" placeholder="Enter destinations (comma-separated)" required>
+           <input type="text" name="destinations" class="form-control" value="{{ trip.destinations | map(attribute='name') | join(', ') }}" placeholder="Enter destinations (comma-separated)" required>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">

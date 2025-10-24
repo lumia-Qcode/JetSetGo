@@ -57,7 +57,23 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <b>{{ item.title }}</b> ({{ item.date }})<br>
-                        {{ item.location or "No location" }} | {{ item.notes or "" }}
+                        {% if item.location %}
+                            Location: {{ item.location }}<br>
+                        {% else %}
+                            No location<br>
+                        {% endif %}
+
+                        {% if item.notes %}
+                            Notes: {{ item.notes }}<br>
+                        {% else %}
+                            No notes<br>
+                        {% endif %}
+
+                        {% if item.time %}
+                            Due Time: {{ item.time }}<br>
+                        {% else %}
+                            No time<br>
+                        {% endif %}
                     </div>
                     
                     <div class="d-flex gap-2">
@@ -77,6 +93,7 @@
         <h5>Add Itinerary Item</h5>
         <input type="text" name="title" placeholder="Title" required class="form-control mb-2">
         <input type="date" name="date" required class="form-control mb-2">
+        <input type="time" name="time" class="form-control mb-2">
         <input type="text" name="location" placeholder="Location" class="form-control mb-2">
         <textarea name="notes" placeholder="Notes" class="form-control mb-2"></textarea>
         <button type="submit" class="btn btn-success">Add Item</button>
@@ -98,6 +115,16 @@
     {% endif %}
 </div>
 
+    <!-- Tasks Section -->
+    <hr>
+    <h3>🧾 Tasks</h3>
+    <p>Keep track of your to-do list for this trip.</p>
+
+    <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-info">
+        ➕ Add Task
+    </a>
+
+    
 <div class="text-end mb-3">
     <a href="{{ url_for('trips.view_trips') }}" class="btn btn-secondary mt-3">⬅ Back to Trips</a>
 </div>

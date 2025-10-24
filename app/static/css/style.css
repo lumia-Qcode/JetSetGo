@@ -170,6 +170,24 @@ footer {
   color: #6b0000;
 }
 
+.flash.info {
+  background-color: #cce5ff;
+  color: #084298;
+}
+
+/* Warning (yellow) */
+.flash.warning {
+  background-color: #fff3cd;
+  color: #664d03;
+}
+
+/* Auto fade animation */
+@keyframes fadeOut {
+  0%   { opacity: 1; transform: translateY(0); }
+  80%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); display: none; }
+}
+
 /* ==== Forms ==== */
 .task-form, .login-box form, .form-group {
   margin-top: 20px;
@@ -525,6 +543,19 @@ input:focus {
 .add-expense-form h5 {
   margin-bottom: 0.8rem;
   color: #6a0572;
+}
+
+.edit-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.edit-btn:hover svg {
+    transform: scale(1.2);
+    fill: #FFD700; /* brighter yellow on hover */
 }
 
 

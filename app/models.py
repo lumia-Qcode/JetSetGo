@@ -74,6 +74,13 @@ class Task(db.Model):
         db.session.commit()
         return task
     
+    def update(self, title=None, due_date=None, due_time=None):   # Update Task Details
+        if title: self.title = title
+        if due_date: self.due_date = due_date
+        if due_time: self.due_time = due_time
+        db.session.commit()
+        return self
+    
     def toggle_status(self):    # Change Status Pending -> Working -> Done -> Pending
         if self.status == 'Pending':
             self.status = 'Working'
@@ -154,8 +161,8 @@ class Trip(db.Model):
         db.session.commit()
         return self
 
-    def add_itinerary_item(self, title, date, location=None, notes=None):   # Add new itinerary item
-        item = ItineraryItem(title=title, date=date, location=location, notes=notes, trip_id=self.id)
+    def add_itinerary_item(self, title, date, location=None, notes=None, time=None):   # Add new itinerary item
+        item = ItineraryItem(title=title, date=date, location=location, notes=notes, time=time, trip_id=self.id)
         db.session.add(item)
         db.session.commit()
         return item
@@ -247,16 +254,18 @@ class ItineraryItem(db.Model):
     date = db.Column(db.Date, nullable=False)
     location = db.Column(db.String(150))
     notes = db.Column(db.Text)
+    time = db.Column(db.Time)
 
     # Relationships
     trip_id = db.Column(db.Integer, db.ForeignKey("trip.id"), nullable=False)
 
     # Functions
-    def update(self, title=None, date=None, location=None, notes=None):     # Update itinerary item details
+    def update(self, title=None, date=None, location=None, notes=None, time=None):     # Update itinerary item details
         if title: self.title = title
         if date: self.date = date
         if location: self.location = location
         if notes: self.notes = notes
+        if time: self.time = time
         db.session.commit()
         return self
 
@@ -279,6 +288,7 @@ class Budget(db.Model):
     # Relationships
     trip_id = db.Column(db.Integer, db.ForeignKey("trip.id"), nullable=False)
     expenses = db.relationship("Expense", backref="budget", lazy=True, cascade="all, delete-orphan")
+    planned_budgets = db.relationship("PlannedBudget", backref="budget", cascade="all, delete-orphan")
 
     # Functions
     def add_expense(self, amount, description, shared_with=None):
@@ -287,13 +297,49 @@ class Budget(db.Model):
         db.session.add(expense)
         db.session.commit()
         return expense
+    
+    def add_planned_budget(self, amount, category):
+        planned_budget = PlannedBudget(amount=amount, category=category, budget_id=self.id)
+        self.total_planned += amount
+        db.session.add(planned_budget)
+        db.session.commit()
+        return planned_budget
 
     def calculate_remaining(self):  # Return remaining balance in budget
         return self.total_planned - self.total_spent
     
+    def update_totals(self):   # Recalculate total planned and spent amounts
+        self.total_planned = sum(pb.amount for pb in self.planned_budgets)
+        self.total_spent = sum(exp.amount for exp in self.expenses)
+        db.session.commit()
+
     def __repr__(self):
         return f"<Budget Planned={self.total_planned}, Spent={self.total_spent}>"
 
+#==========================================================================================================
+class PlannedBudget(db.Model):
+    __tablename__ = "planned_budget"
+    id = db.Column(db.Integer, primary_key=True)
+    amount = db.Column(db.Float, nullable=False)
+    category = db.Column(db.String(50), nullable=False)
+
+    # Relationships
+    budget_id = db.Column(db.Integer, db.ForeignKey("budget.id"), nullable=False)
+
+    def update_budget(self, new_amount, new_category):   # Update planned budget amount
+        self.amount = float(new_amount)
+        self.category = new_category
+        db.session.commit()
+        self.budget.update_totals()
+        return self
+
+    def delete_planned_budget(self):   # Delete this planned budget
+        db.session.delete(self)
+        db.session.commit()
+        self.budget.update_totals()
+
+    def __repr__(self):
+        return f"<PlannedBudget {self.category}: {self.amount}>"
 #==========================================================================================================
 
 class Expense(db.Model):
@@ -321,11 +367,13 @@ class Expense(db.Model):
             self.category = category
 
         db.session.commit()
+        self.budget.update_totals()
         return self
 
     def delete_expense(self):   # Delete this expense
         db.session.delete(self)
         db.session.commit()
+        self.budget.update_totals()
 
     def split_with(self, usernames):    # Share this expense with other users(friends)
         self.shared_with = ",".join(usernames)

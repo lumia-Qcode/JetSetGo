@@ -16,11 +16,11 @@ def view_tasks():
     return render_template('tasks.html', tasks = tasks)     # Render tasks.html template with user's tasks
 
 #==========================================================================================================
-
-@tasks_bp.route('/add', methods = ["POST"])
+@tasks_bp.route('/add', methods=["POST"])
 def add_task():
     if 'user_id' not in session or 'user_email' not in session:     # If user not logged in, redirect to login
         return redirect(url_for('auth.login'))
+
     
     # Retrieve form data
     title = request.form.get('title')
@@ -38,6 +38,26 @@ def add_task():
     
     # Redirect back to the tasks view after adding the task
     return redirect(url_for("tasks.view_tasks"))
+
+#==========================================================================================================
+@tasks_bp.route('/edit/<int:task_id>', methods = ["GET", "POST"])
+def edit_task(task_id):     # Edit task details, called when user submits the edit form
+    task = Task.query.get(task_id)      # Get task by ID
+    if request.method == "POST":
+        if task and task.user_id == session['user_id']:    # If task exists and belongs to the logged-in user, update its details
+            title = request.form.get('title')
+            due_date_str = request.form.get('due_date')
+            due_time_str = request.form.get('due_time')
+
+        # Convert date and time strings (STR) to appropriate formats (DATE and TIME)
+            due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date() if due_date_str else None
+            due_time = datetime.strptime(due_time_str, '%H:%M').time() if due_time_str else None
+
+            task.update(title=title, due_date=due_date, due_time=due_time)   # Call instance method to update task details
+
+            flash("Task updated successfully!", "success")
+            return redirect(url_for("tasks.view_tasks"))
+    return render_template('edit_task.html', task=task)   # Render edit_task.html template with the task details
 
 #==========================================================================================================
 

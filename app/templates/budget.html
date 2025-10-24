@@ -17,6 +17,81 @@
         </p>
     </div>
 
+    <!-- Planned Budgets -->
+<h3>Planned Budgets</h3>
+{% if trip.budget.planned_budgets|length == 0 %}
+    <p class="text-muted">No planned budgets yet.</p>
+{% else %}
+    <ul class="list-group mb-3">
+      {% for pb in trip.budget.planned_budgets %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <div>
+            <b>{{ pb.category }}</b> — ${{ pb.amount }}
+          </div>
+          <div>
+            <!-- Edit and Delete buttons -->
+            <a href="{{ url_for('trips.update_planned_budget', planned_budget_id=pb.id) }}" class="btn btn-primary btn-sm"> Edit </a>
+
+
+            <form action="{{ url_for('trips.delete_planned_budget', planned_budget_id=pb.id) }}" method="POST"
+                  onsubmit="return confirm('Delete this planned budget?');" class="d-inline">
+                <button class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+{% endif %}
+
+<!-- Add Planned Budget -->
+<div class="card p-3 mb-4">
+    <h5>Add Planned Budget</h5>
+    <form action="{{ url_for('trips.add_planned_budget', trip_id=trip.id) }}" method="POST" id="plannedBudgetForm">
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <label for="suggestedCategory" class="form-label">Select Category</label>
+                <select name="category" id="suggestedCategory" class="form-select">
+                    <option value="" disabled selected>-- Choose or write below --</option>
+                    <option value="Food">Food</option>
+                    <option value="Transport">Transport</option>
+                    <option value="Accommodation">Accommodation</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                </select>
+            </div>
+
+            <div class="col-md-4 mb-2">
+                <label for="customCategory" class="form-label">Or enter custom category</label>
+                <input type="text" id="customCategory" class="form-control" placeholder="Custom category (optional)">
+            </div>
+
+            <div class="col-md-4 mb-2">
+                <label for="plannedAmount" class="form-label">Amount</label>
+                <input type="number" name="amount" step="0.01" min="0" required id="plannedAmount" class="form-control">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success mt-2">Add Planned Budget</button>
+    </form>
+</div>
+
+<script>
+/* Allow user to write custom category and override dropdown */
+document.getElementById('plannedBudgetForm').addEventListener('submit', function (e) {
+    const customCategory = document.getElementById('customCategory').value.trim();
+    const select = document.getElementById('suggestedCategory');
+    if (customCategory) {
+        // If user typed a custom category, replace the select’s value before submitting
+        const tempOption = document.createElement('option');
+        tempOption.value = customCategory;
+        tempOption.text = customCategory;
+        tempOption.selected = true;
+        select.appendChild(tempOption);
+    }
+});
+</script>
+
+
     <!-- Chart -->
     <div class="card p-3 mb-3">
         <h5>Expense Breakdown</h5>
@@ -57,12 +132,7 @@
               </div>
               <div>
                 <!-- Edit button -->
-                <form action="{{ url_for('trips.edit_expense', expense_id=expense.id) }}" method="POST" class="d-inline">
-                    <input type="hidden" name="amount" value="{{ expense.amount }}">
-                    <input type="hidden" name="description" value="{{ expense.description }}">
-                    <input type="hidden" name="shared_with" value="{{ expense.shared_with }}">
-                    <button type="submit" class="btn btn-primary btn-sm">Edit</button>
-                </form>
+                <a href="{{ url_for('trips.edit_expense', expense_id=expense.id) }}" class="btn btn-primary btn-sm"> Edit </a>
 
                 <!-- Delete button -->
                 <form action="{{ url_for('trips.delete_expense', expense_id=expense.id) }}" method="POST"

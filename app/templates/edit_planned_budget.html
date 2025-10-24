@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Edit Planned Budget{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3>✏️ Edit Planned Budget for {{ trip.title }}</h3>
+    <hr>
+
+    <form method="POST" class="card p-3">
+        <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <input type="number" step="0.01" min="0" name="amount" id="amount" 
+                   value="{{ planned_budget.amount }}" required class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="category" class="form-label">Category</label>
+            <input type="text" name="category" id="category" 
+                   value="{{ planned_budget.category }}" required class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
