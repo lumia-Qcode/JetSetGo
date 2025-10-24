@@ -1,6 +1,11 @@
 from app import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask import session
+from datetime import datetime, timedelta
+import secrets
+from flask_mail import Message
+from flask import current_app
+from app import mail
 
 #==========================================================================================================
 
@@ -20,6 +25,52 @@ expense_shared = db.Table(
 
 #==========================================================================================================
 
+class PasswordResetToken(db.Model):
+    __tablename__ = "password_reset_tokens"
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = db.Column(db.String(100), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)
+
+    # Relationship to user
+    user = db.relationship("User", backref=db.backref("reset_tokens", lazy=True))
+
+    @classmethod
+    def generate_token(cls, user, expires_in=3600):
+        token = secrets.token_urlsafe(32)  # secure random token
+        expires_at = datetime.utcnow() + timedelta(seconds=expires_in)
+        reset_token = cls(token=token, user=user, expires_at=expires_at)
+        db.session.add(reset_token)
+        db.session.commit()
+        return token
+
+    def is_valid(self):
+        return not self.used and datetime.utcnow() < self.expires_at
+
+    def mark_as_used(self):
+        self.used = True
+        db.session.commit()
+
+    def reset_password(self, new_password):
+        """
+        Resets the user's password and marks the token as used.
+        Raises ValueError if token is invalid or expired.
+        """
+        if not self.is_valid():
+            raise ValueError("Token is invalid or expired.")
+
+        self.user.password = generate_password_hash(new_password)
+        self.mark_as_used()  # marks the token as used and commits
+        db.session.commit()
+
+    def send_email(to_email, subject, body):
+        msg = Message(subject=subject, recipients=[to_email], body=body, sender=current_app.config['MAIL_USERNAME'])
+        mail.send(msg)
+
+#==========================================================================================================
 class User(db.Model):
     # Attributes
     __tablename__ = 'user'
@@ -391,7 +442,7 @@ class Expense(db.Model):
         if user in self.shared_users and user.id == session.get('user_id'): # You can only remove yourself
             self.shared_users.remove(user)
             db.session.commit()
-            
+
         if not self.shared_users:   # If no shared users left, mark expense as Unshared
             db.session.delete(self)
             db.session.commit()

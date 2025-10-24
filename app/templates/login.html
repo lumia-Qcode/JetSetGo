@@ -23,9 +23,12 @@
             </div>
         </div>
 
-
         <button type="submit" class="btn">Login</button>
     </form>
+
+    <div class="mt-3">
+        <a href="{{ url_for('auth.forgot_password') }}" class="btn btn-link">Forgot Password?</a>
+    </div>
 </div>
 {% endblock %}
 

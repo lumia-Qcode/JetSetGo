@@ -1,8 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_mail import Mail
 
 # create database object globally to be used in models and routes across the app
 db = SQLAlchemy()
+mail = Mail()
 
 def create_app():
     app = Flask(__name__)       # create Flask app instance
@@ -28,5 +30,15 @@ def create_app():
     app.register_blueprint(view_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(trips_bp)
+
+    app.config.update(
+        MAIL_SERVER='smtp.gmail.com',
+        MAIL_PORT=587,
+        MAIL_USE_TLS=True,
+        MAIL_USE_SSL=False,
+        MAIL_USERNAME='your@gmail.com',
+        MAIL_PASSWORD='your-email-password'
+    )
+    mail.init_app(app)
 
     return app
