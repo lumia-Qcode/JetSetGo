@@ -11,6 +11,13 @@ trip_users = db.Table(      # This creates a join table (no model class needed) 
     db.Column("trip_id", db.Integer, db.ForeignKey("trip.id"), primary_key=True)
 )
 
+# Association table (Many to Many) between Expenses and Users for sharing
+expense_shared = db.Table(
+    "expense_shared",
+    db.Column("expense_id", db.Integer, db.ForeignKey("expense.id"), primary_key=True),
+    db.Column("user_id", db.Integer, db.ForeignKey("user.id"), primary_key=True)
+)
+
 #==========================================================================================================
 
 class User(db.Model):
@@ -20,6 +27,9 @@ class User(db.Model):
     username = db.Column(db.String(100), nullable = False)
     email = db.Column(db.String(100), unique = True, nullable = False)
     password = db.Column(db.String(200), nullable = False)
+
+    # Relationships
+    shared_expenses = db.relationship("Expense", secondary=expense_shared, backref="users_shared")
 
     # Functions
     @classmethod
@@ -174,17 +184,21 @@ class Trip(db.Model):
             db.session.commit()
         return self.budget
 
-    def add_expense(self, amount, category, description, shared_with=None):     # Add new expense to budget, create budget if none exists
+    def add_expense(self, amount, category, description, shared_friends=None):     # Add new expense to budget, create budget if none exists
         if not self.budget:
             self.init_budget()
 
         expense = Expense(
             amount=amount,
             description=description,
-            shared_with=",".join(shared_with) if shared_with else None,
             budget_id=self.budget.id,
             category=category
         )
+        if shared_friends:
+            for user in shared_friends:
+                if user in User.query.all() and user not in expense.shared_users:
+                    if user in self.participants:
+                        expense.shared_users.append(user)
         self.budget.total_spent += amount  
         db.session.add(expense)
         db.session.commit()
@@ -348,29 +362,48 @@ class Expense(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
-    shared_with = db.Column(db.String(200))
     category = db.Column(db.String(50), default="General") 
     status = db.Column(db.String(20), default="Unshared")  # Unshared, Shared, Accepted, Rejected 
 
     # Relationships
     budget_id = db.Column(db.Integer, db.ForeignKey("budget.id"), nullable=False)
+    shared_users = db.relationship("User", secondary=expense_shared, backref="expenses_shared_with_me")
 
     # Functions
-    def update_details(self, amount=None, description=None, shared_with=None, category=None):   # Update this expense details
+    def update_details(self, amount=None, description=None, category=None, shared_friends=None):   # Update this expense details
         if amount is not None:
             self.amount = float(amount)
         if description is not None:
             self.description = description
-        if shared_with is not None:
-            self.shared_with = shared_with
         if category is not None:
             self.category = category
+        if shared_friends is not None:
+            for user in shared_friends:
+                if user in User.query.all() and user not in self.shared_users:
+                    if user in self.budget.trip.participants:
+                        self.shared_users.append(user)
 
         db.session.commit()
         self.budget.update_totals()
         return self
+    
+    def leave_expense(self, user):   # Remove a shared user from this expense
+        if user in self.shared_users and user.id == session.get('user_id'): # You can only remove yourself
+            self.shared_users.remove(user)
+            db.session.commit()
+            
+        if not self.shared_users:   # If no shared users left, mark expense as Unshared
+            db.session.delete(self)
+            db.session.commit()
+            # create logic if u want to remove someone else first notify them and then remove
+        
+    def remove_all_shared_users(self):   # Remove all shared users from this expense
+        for user in self.shared_users:
+            self.shared_users.remove(user)
+        db.session.commit()
 
     def delete_expense(self):   # Delete this expense
+        self.remove_all_shared_users()
         db.session.delete(self)
         db.session.commit()
         self.budget.update_totals()
@@ -392,6 +425,7 @@ class Expense(db.Model):
         return f"<Expense {self.amount} - {self.description}>"
     
 #==========================================================================================================
+
 
 # <......WE NEED TO FIX THIS NOTIFICATION CLASS AND ITS INHERITORS LATER......>
 

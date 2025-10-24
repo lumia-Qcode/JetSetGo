@@ -115,12 +115,13 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <div>
                 <b>{{ expense.description }}</b> - ${{ expense.amount }}
-                {% if expense.shared_with %}
+                {% if expense.shared_users %}
                   <p class="mb-1">
-                    Shared with: {{ expense.shared_with }} ({{ expense.status }})
+                    Shared with: 
+                    {{ expense.shared_users | map(attribute='username') | join(', ') }} ({{ expense.status }})
                   </p>
 
-                  {% if expense.status == "Pending" and expense.shared_with == session['user_name'] %}
+                  {% if expense.status == "Pending" and expense.shared_users | map(attribute='username') | join(', ') == session['user_name'] %}
                     <form action="{{ url_for('trips.respond_share', expense_id=expense.id, response='accept') }}" method="post" class="d-inline">
                       <button type="submit" class="btn btn-success btn-sm">Accept</button>
                     </form>
@@ -133,7 +134,11 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
               <div>
                 <!-- Edit button -->
                 <a href="{{ url_for('trips.edit_expense', expense_id=expense.id) }}" class="btn btn-primary btn-sm"> Edit </a>
-
+                <!-- Leave button -->
+                <form action="{{ url_for('trips.leave_expense', expense_id=expense.id) }}" method="POST"
+                      onsubmit="return confirm('Leave this shared expense?');" class="d-inline">
+                    <button class="btn btn-warning btn-sm">Leave</button>
+                </form>
                 <!-- Delete button -->
                 <form action="{{ url_for('trips.delete_expense', expense_id=expense.id) }}" method="POST"
                       onsubmit="return confirm('Delete this expense?');" class="d-inline">

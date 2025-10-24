@@ -280,11 +280,18 @@ def trip_budget(trip_id):
         category = request.form.get("category")
         description = request.form.get("description")
         shared_with = request.form.get("shared_with")
+        
+        if shared_with: 
+            usernames = [u.strip() for u in shared_with.split(",")]
+            users = User.query.filter(User.username.in_(usernames)).all()
+            users.append(User.query.get(session["user_id"]))  # Ensure current user is included
+        else: 
+            users = []
 
         if amount <= 0 or not category:   # Basic validation
             flash("Invalid expense details", "danger")
         else:
-            trip.add_expense(amount, category=category, description=description, shared_with=shared_with.split(",") if shared_with else None)
+            trip.add_expense(amount, category=category, description=description, shared_friends=users)
 
         flash("Expense added successfully!", "success")
         return redirect(url_for("trips.trip_budget", trip_id=trip_id))
@@ -366,12 +373,18 @@ def edit_expense(expense_id):
         shared_with = request.form.get("shared_with")
         category = request.form.get("category")
 
+        if shared_with:
+            usernames = [u.strip() for u in shared_with.split(",")]
+            users = User.query.filter(User.username.in_(usernames)).all()
+        else:
+            users = []
+
         if not amount or float(amount) <= 0:   # Basic validation
             flash("Invalid expense amount", "danger")
             return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
     
         # Update expense details using instance method
-        expense.update_details(amount=amount, description=description, shared_with=shared_with, category=category)
+        expense.update_details(amount=amount, description=description, shared_friends=users, category=category)
 
         flash("Expense updated successfully!", "success")
         return redirect(url_for("trips.trip_budget", trip_id=expense.budget.trip_id))
@@ -387,6 +400,20 @@ def delete_expense(expense_id):     # Delete an expense
     expense.delete_expense()
 
     flash("Expense deleted!", "success")
+    return redirect(url_for("trips.trip_budget", trip_id=trip_id))
+
+#==========================================================================================================
+@trips_bp.route("/expense/<int:expense_id>/leave_expense", methods=["POST"])
+def leave_expense(expense_id):     # Leave an expense
+    expense = Expense.query.get_or_404(expense_id)
+
+    if request.method == "POST":
+        trip_id = expense.budget.trip_id
+        user = User.query.get(session["user_id"])   # Current user leaving the expense
+        expense.leave_expense(user)
+
+        flash("You have left this expense.", "info")
+        return redirect(url_for("trips.trip_budget", trip_id=trip_id))
     return redirect(url_for("trips.trip_budget", trip_id=trip_id))
 
 #==========================================================================================================
