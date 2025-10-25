@@ -209,7 +209,7 @@ def add_itinerary(trip_id):
     
     # Convert date string to date object
     date = datetime.strptime(date, "%Y-%m-%d").date()
-    time = datetime.strptime(time, "%H:%M:%S").time() if time else None
+    time = datetime.strptime(time, "%H:%M").time() if time else None
     trip.add_itinerary_item(title, date, location, notes, time)   # Call instance method to add itinerary item
 
     flash("Itinerary item added!", "success")
@@ -238,7 +238,7 @@ def edit_itinerary(item_id):
         if date:
             date = datetime.strptime(date, "%Y-%m-%d").date()
         if time:
-            time = datetime.strptime(time, "%H:%M:%S").time()
+            time = datetime.strptime(time, "%H:%M").time()
 
          # Update itinerary item details using instance method
         item.update(title=title, date=date, location=location, notes=notes, time=time)

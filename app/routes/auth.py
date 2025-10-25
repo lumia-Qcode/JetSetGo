@@ -51,7 +51,7 @@ def register():
        
         if not user:        # If email already exists → show error and redirect to register again
             flash('Email already in use. Please register with another email.', 'danger')
-            return redirect(url_for('register'))
+            return redirect(url_for('auth.register'))
 
         flash('Registered Successfully!', 'success')    #  If registration successful → show success and redirect to login
         return redirect(url_for('auth.login'))
