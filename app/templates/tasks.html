@@ -41,12 +41,12 @@
                 <td>
                     <span class="badge {{task.status|lower}}">{{ task.status }}</span>
                 </td>
-                <td>
+                <td class="action-cell">
                     <form action="{{ url_for('tasks.toggle_status', task_id = task.id) }}" method="POST">
                         <button class="btn-small" type="submit">Next</button>
                     </form>
                 </td>
-                <td>
+                <td class="action-cell">
                     <a href="{{ url_for('tasks.edit_task', task_id=task.id) }}" class="edit-icon" title="Edit Task">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="goldenrod" viewBox="0 0 16 16">
                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 
@@ -60,17 +60,39 @@
                         </svg>
                     </a>            
                 </td>
-                <td>
-                    <form action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST">
-                    <button type="submit" class="trash-btn" title="Delete Task">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 448 512">
-                        <path fill="red" d="M135.2 17.7C140.6 7 151.5 0 163.5 0h121c12 0 22.9 7 28.3 17.7l13.6 26.3H432c8.8 0 16 7.2 16 16s-7.2 16-16 16h-16.1l-26.4 393.3c-1.7 25-22.5 45.7-47.6 45.7H106.1c-25.1 0-45.9-20.7-47.6-45.7L32.1 76H16c-8.8 0-16-7.2-16-16s7.2-16 16-16h105.7l13.5-26.3zM182.4 96c-8.8 0-16 7.2-16 16v288c0 8.8 7.2 16 16 16s16-7.2 16-16V112c0-8.8-7.2-16-16-16zm83.2 0c-8.8 0-16 7.2-16 16v288c0 8.8 7.2 16 16 16s16-7.2 16-16V112c0-8.8-7.2-16-16-16z"/>
-                         </svg>
-                    </button>
-                    </form>
-                </td>
+              <td class="action-cell">
+
+    <a href="#" class="trash-link" title="Delete Task"
+       onclick="event.preventDefault(); document.getElementById('delete-form-{{ task.id }}').submit();">
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16"
+             style="filter: drop-shadow(0 0 8px hotpink); background: transparent;">
+            <path fill="hotpink" d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 
+            0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 
+            0V6a.5.5 0 0 1 .5-.5zm3 .5v6a.5.5 0 0 
+            1-1 0V6a.5.5 0 0 1 1 0z"/>
+            <path fill="hotpink" d="M14.5 3a1 1 0 0 1-1 
+            1H13v9a2 2 0 0 1-2 
+            2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 
+            1 0-2H5V1a1 1 0 0 1 1-1h4a1 1 0 0 
+            1 1 1v1h2.5a1 1 0 0 1 1 
+            1zM6 1v1h4V1H6z"/>
+        </svg>
+    </a>
+
+    <!-- Hidden POST form -->
+    <form id="delete-form-{{ task.id }}" action="{{ url_for('tasks.delete_task', task_id=task.id) }}" method="POST" style="display:none;"></form>
+
+</td>
+
             </tr>
             {% endfor %}
+
+            <script>
+                document.querySelectorAll(".task-table tbody tr").forEach((row, index) => {
+                    row.style.setProperty("--i", index + 1);
+                });
+            </script>
         </tbody>
     </table>
     {% else %}

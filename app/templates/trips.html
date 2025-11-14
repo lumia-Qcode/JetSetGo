@@ -35,10 +35,10 @@
                 <!-- Buttons -->
                 <div class="d-flex justify-content-between align-items-center mt-3">
                   <div class="d-flex gap-2">
-                    <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn btn-primary btn-sm">
+                    <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn btn-link btn-primary btn-sm">
                       View
                     </a>
-                    <a href="{{ url_for('trips.edit_trip', trip_id=trip.id) }}" class="btn btn-warning btn-sm">
+                    <a href="{{ url_for('trips.edit_trip', trip_id=trip.id) }}" class="btn btn-link btn-warning btn-sm">
                       Edit
                     </a>
                   </div>
@@ -47,7 +47,7 @@
                   <form
                     action="{{ url_for('trips.delete_trip', trip_id=trip.id) }}"
                     method="POST"
-                    onsubmit="return confirm('🗑️ Leave or delete this trip?');"
+                    onsubmit="return confirm('Leave or delete this trip?');"
                     class="d-inline"
                   >
                     <button type="submit" class="btn btn-link p-0" title="Delete Trip" style="color: red;">
@@ -71,7 +71,7 @@
     <a href="{{ url_for('trips.create_trip') }}" class="btn btn-link btn-success mb-3">Create New Trip</a>
   </div>
 
-  {% if trips|length > 0 %}
+  {% if trip_users|length > 0 %}
   <!-- Delete All Trips button only if trips exist -->
   <div class="text-center mt-2">
     <a href="#" class="btn btn-link btn-danger" id="deleteAllBtn">Delete All Trips</a>
@@ -82,7 +82,7 @@
   <div id="deleteConfirmCard"
        class="position-fixed top-50 start-50 translate-middle bg-white shadow-lg p-4 rounded-4 border"
        style="display:none; z-index:1050; max-width: 400px; width: 90%;">
-    <h4 class="text-danger text-center mb-3">⚠️ Confirm Deletion</h4>
+    <h4 class="text-danger text-center mb-3">⚠️Confirm Deletion</h4>
     <p>This will permanently delete <b>all your trips</b>, including itineraries, budgets, and expenses.</p>
     <form method="POST" action="{{ url_for('trips.delete_user_trips', user_id=session['user_id']) }}">
       <div class="form-group mb-3">

@@ -2,34 +2,34 @@
 {% block title %}Edit Trip{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>Edit Trip ✏️</h2>
-    <form method="POST" action="{{ url_for('trips.edit_trip', trip_id=trip.id) }}">
-        <div class="mb-3">
-            <label>Title</label>
-            <input type="text" name="title" class="form-control" value="{{ trip.title }}" required>
+<div class="container mt-4 edit-trip-card">
+    <h2 class="edit-trip-heading">Edit Trip ✏️</h2>
+    <form method="POST" action="{{ url_for('trips.edit_trip', trip_id=trip.id) }}" class="edit-trip-form">
+        <div class="form-group mb-3">
+            <label class="edit-label">Title</label>
+            <input type="text" name="title" class="edit-input" value="{{ trip.title }}" required>
         </div>
-        <div class="mb-3">
-            <label>Destination</label>
-           <input type="text" name="destinations" class="form-control" value="{{ trip.destinations | map(attribute='name') | join(', ') }}" placeholder="Enter destinations (comma-separated)" required>
+        <div class="form-group mb-3">
+            <label class="edit-label">Destination</label>
+            <input type="text" name="destinations" class="edit-input" value="{{ trip.destinations | map(attribute='name') | join(', ') }}" placeholder="Enter destinations (comma-separated)" required>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label>Start Date</label>
-                <input type="date" name="start_date" class="form-control" value="{{ trip.start_date }}" required>
+                <label class="edit-label">Start Date</label>
+                <input type="date" name="start_date" class="edit-input date-picker" value="{{ trip.start_date }}" required>
             </div>
             <div class="col-md-6 mb-3">
-                <label>End Date</label>
-                <input type="date" name="end_date" class="form-control" value="{{ trip.end_date }}" required>
+                <label class="edit-label">End Date</label>
+                <input type="date" name="end_date" class="edit-input date-picker" value="{{ trip.end_date }}" required>
             </div>
         </div>
-        <div class="mb-3">
-            <label>Description</label>
-            <textarea name="description" class="form-control" rows="3">{{ trip.description }}</textarea>
+        <div class="form-group mb-3">
+            <label class="edit-label">Description</label>
+            <textarea name="description" class="edit-textarea">{{ trip.description }}</textarea>
         </div>
-        <div class="d-flex justify-content-between">
-            <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
-            <button type="submit" class="btn btn-success">Save Changes</button>
+        <div class="d-flex justify-content-between edit-buttons">
+            <button type="submit" class="btn btn-save">Save Changes</button>
+            <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn-link cancel-btn">Cancel</a>
         </div>
     </form>
 </div>

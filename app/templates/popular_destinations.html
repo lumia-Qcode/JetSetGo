@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Popular Destinations{% endblock %}
+
+{% block content %}
+
+<div class="favorites-container">
+
+    <div class="favorites-header">
+        <h1>🔥 Popular Destinations</h1>
+        <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary">← Back to My Favorites</a>
+    </div>
+
+    <p style="color:#666; margin-bottom:30px;">
+        Discover the most loved destinations by travelers
+    </p>
+
+    {% if destinations %}
+    <div class="favorites-grid">
+
+        {% for destination in destinations %}
+        <div class="favorite-card">
+
+            <div class="favorite-image">
+                {% if destination.image_url %}
+                <img src="{{ destination.image_url }}" alt="{{ destination.name }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                <span>📍</span>
+                {% endif %}
+            </div>
+
+            <div class="favorite-content">
+                <div class="favorite-title">{{ destination.name }}</div>
+
+                {% if destination.country %}
+                <div class="favorite-country">🌍 {{ destination.country }}</div>
+                {% endif %}
+
+                <div style="color:#ff6348; font-weight:bold; margin-bottom:10px;">
+                    ❤️ {{ destination.get_favorite_count() }} travelers love this
+                </div>
+
+                {% if destination.description %}
+                <div class="favorite-description">
+                    {{ destination.description[:100] }}{% if destination.description|length > 100 %}...{% endif %}
+                </div>
+                {% endif %}
+
+                <form action="{{ url_for('trips.add_favorite') }}" method="POST" style="margin-top:15px;">
+                    <input type="hidden" name="name" value="{{ destination.name }}">
+                    <input type="hidden" name="country" value="{{ destination.country or '' }}">
+                    <input type="hidden" name="description" value="{{ destination.description or '' }}">
+                    <input type="hidden" name="image_url" value="{{ destination.image_url or '' }}">
+                    <button class="btn btn-primary">Add to My Favorites</button>
+                </form>
+            </div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🗺️</div>
+        <h2>No popular destinations yet</h2>
+        <p>Be the first to add some favorites!</p>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -231,11 +231,76 @@ input {
     z-index: 20;
 }
 
+
 input:focus {
     border-color: var(--neon-pink);
     outline: none;
     box-shadow: 0 0 10px var(--neon-pink);
 }
+
+/* ============================
+   🔥 DATE/TIME PICKER FULL CSS
+   ============================ */
+
+/* Restore native UI but keep dark mode */
+input[type="date"],
+input[type="time"] {
+    appearance: auto;
+    -webkit-appearance: auto;
+
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid #333;
+    padding: 12px 14px;
+    border-radius: 8px;
+
+    position: static;
+    z-index: auto;
+}
+
+/* ============================
+   🌈 Neon Pulse Animation
+   ============================ */
+@keyframes neonPulse {
+    0% {
+        filter: invert(1) drop-shadow(0 0 4px var(--neon-pink));
+        transform: scale(1.2);
+    }
+    50% {
+        filter: invert(1) drop-shadow(0 0 12px var(--neon-pink));
+        transform: scale(1.32);
+    }
+    100% {
+        filter: invert(1) drop-shadow(0 0 4px var(--neon-pink));
+        transform: scale(1.2);
+    }
+}
+
+/* ============================
+   ✨ Icon Styles (Calendar & Clock)
+   ============================ */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+
+    filter: invert(1) drop-shadow(0 0 6px var(--neon-pink));
+    transform: scale(1.2);
+
+    /* 🔥 Pulsing neon animation */
+    animation: neonPulse 2.2s infinite ease-in-out;
+}
+
+/* ============================
+   ⚡ Stronger glow on focus
+   ============================ */
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="time"]:focus::-webkit-calendar-picker-indicator {
+    animation: neonPulse 1.2s infinite ease-in-out;
+    filter: invert(1) drop-shadow(0 0 16px var(--neon-pink));
+}
+
 
 /* Password Wrapper Fix */
 .password-wrapper {
@@ -375,6 +440,7 @@ footer:hover {
     .card h3 {
         font-size: 20px;
     }
+
 }
 
 /* ----------------------------------------------------
@@ -663,5 +729,892 @@ input:-moz-autofill {
     box-shadow: 0 0 12px var(--neon-pink);
     outline: none;
 }
+
+/* ----------------------------------------------------
+   CREATE TRIP PAGE
+---------------------------------------------------- */
+
+/* Card Container */
+.create-trip-card {
+    background: var(--card-bg);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 35px 30px;
+    max-width: 600px;
+    width: 95%;
+    margin: 60px auto;
+    box-shadow: 
+        0 0 20px var(--neon-pink), 
+        0 0 40px rgba(255, 91, 224, 0.2),
+        inset 0 0 12px var(--neon-pink);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated Neon Border */
+.create-trip-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
+    background-size: 400% 400%;
+    animation: gradientMove 6s infinite linear;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
+}
+
+/* Header */
+.create-trip-card h3 {
+    text-align: center;
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Form Inputs and Textarea */
+.create-trip-card input,
+.create-trip-card textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid var(--neon-pink);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.create-trip-card input:focus,
+.create-trip-card textarea:focus {
+    border-color: var(--neon-pink);
+    outline: none;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+/* Labels */
+.create-trip-card label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: var(--soft-text);
+    font-weight: 500;
+    z-index: 10;
+    position: relative;
+}
+
+/* Create Trip Button - full width */
+.create-trip-card .create-trip-btn {
+    width: 100%;
+    padding: 12px 0;           /* height */
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-pink);
+    margin-top: 10px;
+    text-align: center;
+    transition: 0.3s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.create-trip-card .create-trip-btn:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+/* Cancel Button - shrink to text, centered */
+.cancel-btn {
+    display: inline-block;        /* shrink to text width */
+    max-width: 100%;              /* never exceed card width */
+    padding: 12px 20px;           /* same height as Create button */
+    margin: 15px auto 0;          /* center horizontally under Create */
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-pink);
+    text-decoration: none;
+    text-align: center;
+    transition: 0.3s ease;
+}
+
+.cancel-btn:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .create-trip-card {
+        margin: 40px auto;
+        padding: 25px 20px;
+    }
+
+    .create-trip-card h3 {
+        font-size: 24px;
+    }
+
+    .create-trip-card .cancel-btn {
+        width: auto;            /* keep shrink-to-text on mobile */
+    }
+}
+
+/* Animate Neon Gradient (shared with other cards) */
+@keyframes gradientMove {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* -----------------------------
+   Buttons inside trip cards (slightly bigger)
+------------------------------ */
+
+/* View & Edit buttons */
+.row .card .btn-primary,
+.row .card .btn-warning {
+    width: auto !important;       /* shrink to text width */
+    padding: 6px 14px;            /* a bit taller and wider */
+    font-size: 0.95rem;           /* slightly larger text */
+    border-radius: 6px;
+    box-shadow: 0 0 8px var(--neon-pink);
+}
+
+/* Hover effect for primary & warning buttons */
+.row .card .btn-primary:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 12px var(--neon-hover);
+    color: #000;
+}
+
+.row .card .btn-warning:hover {
+    background: #ffdd57;
+    box-shadow: 0 0 12px #ffdd57;
+    color: #000;
+}
+
+/* Trash button (icon only) */
+.row .card .btn-link {
+    width: auto !important;       /* shrink to icon */
+    padding: 2px;                  /* small padding around icon */
+    display: inline-flex;          /* inline-flex for SVG alignment */
+    align-items: center;
+    justify-content: center;
+}
+
+.row .card .btn-link svg {
+    width: 26px; 
+    height: 26px;                  /* slightly bigger icon */
+    filter: drop-shadow(0 0 6px red);
+    transition: transform 0.2s ease;
+}
+
+.row .card .btn-link:hover svg {
+    transform: scale(1.25);       /* slightly bigger on hover */
+}
+
+/* Flex container spacing */
+.row .card .d-flex.gap-2 {
+    gap: 8px;                      /* a little more spacing between View & Edit */
+}
+
+.row .card .d-flex.justify-content-between {
+    justify-content: space-between; /* keep View/Edit left, Trash right */
+}
+
+/* Labels inside Create Trip card aligned left */
+.create-trip-card label {
+    display: block;           /* ensure block */
+    text-align: left;         /* left align text */
+    color: var(--soft-text);
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* ------------------------------
+   EDIT TRIP PAGE STYLES
+------------------------------- */
+
+/* Card Container */
+.edit-trip-card {
+    max-width: 700px;
+    margin: 50px auto;
+    padding: 25px 30px;
+    background: rgba(10, 10, 10, 0.85);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    box-shadow: 
+        0 0 20px var(--neon-pink),
+        0 0 40px rgba(255, 91, 224, 0.2),
+        inset 0 0 12px var(--neon-pink);
+    position: relative;
+}
+
+/* Animated Neon Border */
+.edit-trip-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
+    background-size: 400% 400%;
+    animation: gradientMove 6s infinite linear;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
+}
+
+/* Heading */
+.edit-trip-heading {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 15px var(--neon-pink);
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 10;
+}
+
+/* Form Inputs */
+.edit-trip-form .edit-input,
+.edit-trip-form .edit-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid var(--neon-pink);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+    position: relative;
+    z-index: 10;
+}
+
+.edit-trip-form .edit-input:focus,
+.edit-trip-form .edit-textarea:focus {
+    border-color: var(--neon-pink);
+    outline: none;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+/* Labels */
+.edit-trip-form .edit-label {
+    display: block;
+    text-align: left;
+    color: var(--soft-text);
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* Textarea */
+.edit-trip-form .edit-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Start/End Date columns */
+.edit-trip-form .row .col-md-6 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* Buttons */
+.edit-buttons .btn {
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.3s ease;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+/* ----------------------------------------------------
+   EDIT TRIP – BUTTON STYLES
+---------------------------------------------------- */
+
+/* Wrapper that centers buttons and stacks them */
+.edit-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px; /* spacing between buttons */
+    margin-top: 20px;
+}
+
+/* Save Button (Top Button) */
+.edit-buttons .btn-save {
+    padding: 12px 0;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 14px var(--neon-pink);
+    cursor: pointer;
+    transition: 0.25s ease;
+    text-align: center;
+}
+
+.edit-buttons .btn-save:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+/* Cancel Button (Bottom Button) */
+.edit-buttons .cancel-btn {
+    width: 150px; /* smaller width */
+    padding: 12px 0;
+    display: block; /* allows proper flex centering */
+    text-align: center;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--neon-pink);
+    color: #000;
+    text-decoration: none; /* remove underline */
+    box-shadow: 0 0 14px var(--neon-pink);
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.edit-buttons .cancel-btn:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .edit-trip-card {
+        width: 90%;
+        padding: 20px;
+    }
+    
+    .edit-buttons .btn {
+        width: 48%;
+    }
+}
+
+/* Gradient Animation (shared) */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
+}
+
+/* ----------------------------------------------------
+   TRIP DETAILS PAGE – CYBER NEON STYLING
+---------------------------------------------------- */
+
+/* Page Title */
+.trip-title {
+    color: var(--neon-pink);
+    font-family: "Orbitron", sans-serif;
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 20px;
+}
+
+/* Info Text */
+.trip-details-text {
+    font-size: 16px;
+    color: var(--soft-text);
+}
+
+.trip-details-text b {
+    color: var(--neon-pink);
+}
+
+/* Section Headings */
+.trip-section-title {
+    color: var(--neon-pink);
+    font-family: "Orbitron", sans-serif;
+    margin-top: 30px;
+    margin-bottom: 12px;
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* Input Boxes */
+.trip-details input,
+.trip-details textarea {
+    background: #0a0a0a !important;
+    border: 1px solid var(--neon-pink) !important;
+    box-shadow: 0 0 10px transparent;
+    color: var(--text-color);
+    border-radius: 8px;
+}
+
+.trip-details input:focus,
+.trip-details textarea:focus {
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+
+/* Shared With List */
+.shared-with {
+    color: var(--text-color);
+    font-size: 16px;
+}
+
+/* -----------------------------------------------
+   ITINERARY LIST
+------------------------------------------------ */
+.itinerary-item {
+    background: rgba(10, 10, 10, 0.85) !important;
+    color: var(--text-color) !important;
+    border: 1px solid var(--neon-pink) !important;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(255, 45, 220, 0.3);
+}
+
+/* Edit Button */
+.btn-itinerary-edit {
+    background: var(--neon-pink) !important;
+    color: #000 !important;
+    border: none !important;
+    padding: 6px 12px !important;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+.btn-itinerary-edit:hover {
+    background: var(--neon-hover) !important;
+}
+
+/* Delete Button */
+.btn-itinerary-delete {
+    background: #ff3c3c !important;
+    color: #000 !important;
+    border: none !important;
+    padding: 6px 12px !important;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 0 10px red;
+}
+
+.btn-itinerary-delete:hover {
+    background: #ff5e5e !important;
+}
+
+/* -----------------------------------------------
+   ADD ITINERARY FORM
+------------------------------------------------ */
+.btn-add-itinerary {
+    background: var(--neon-pink) !important;
+    border: none !important;
+    color: #000 !important;
+    width: 180px;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 0;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.btn-add-itinerary:hover {
+    background: var(--neon-hover) !important;
+    box-shadow: 0 0 16px var(--neon-hover);
+}
+
+/* -----------------------------------------------
+   BUDGET SECTION
+------------------------------------------------ */
+.btn-manage-budget {
+    background: var(--neon-pink) !important;
+    color: #000 !important;
+    border: none !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.btn-manage-budget:hover {
+    background: var(--neon-hover) !important;
+}
+
+/* -----------------------------------------------
+   TASKS + BACK BUTTON
+------------------------------------------------ */
+.btn-tasks {
+    background: var(--neon-pink) !important;
+    border: none !important;
+    color: #000 !important;
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 10px 20px;
+    text-decoration: none !important;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.btn-tasks:hover {
+    background: var(--neon-hover) !important;
+}
+
+/* Back Button */
+.btn-back {
+    background: var(--neon-pink) !important;
+    border: 1px solid var(--neon-pink);
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    color: black;
+    transition: 0.2s;
+    display: inline-block;
+}
+
+.btn-back:hover {
+    background: var(--neon-pink);
+    color: black;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+
+
+/* ============================
+   🌌 GENERAL PAGE STYLING
+   ============================ */
+body {
+    background: #050505;
+    color: #eee;
+    font-family: 'Poppins', sans-serif;
+}
+
+.task-box {
+    width: 90%;
+    max-width: 1000px;
+    margin: 40px auto;
+    background: rgba(20, 20, 20, 0.7);
+    padding: 25px;
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    border: 1px solid #333;
+    box-shadow: 0 0 20px rgba(255, 0, 140, 0.2);
+}
+
+.task-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+}
+
+
+
+/* ============================
+   📝 INPUT STYLES
+   ============================ */
+.task-form input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid #333;
+    margin-bottom: 10px;
+    transition: 0.2s ease;
+}
+
+.task-form input:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+    outline: none;
+}
+
+
+
+/* ============================
+   🌈 NEON PULSE ANIMATION
+   ============================ */
+@keyframes neonPulse {
+    0% {
+        filter: invert(1) drop-shadow(0 0 4px var(--neon-pink));
+        transform: scale(1.2);
+    }
+    50% {
+        filter: invert(1) drop-shadow(0 0 12px var(--neon-pink));
+        transform: scale(1.32);
+    }
+    100% {
+        filter: invert(1) drop-shadow(0 0 4px var(--neon-pink));
+        transform: scale(1.2);
+    }
+}
+
+
+
+/* ============================
+   📅 DATE / TIME PICKER ICONS
+   ============================ */
+input[type="date"],
+input[type="time"] {
+    appearance: auto;
+    -webkit-appearance: auto;
+    position: static;
+    z-index: auto;
+    background: #0a0a0a;
+    color: var(--text-color);
+}
+
+/* calendar + clock icon */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+
+    filter: invert(1) drop-shadow(0 0 8px var(--neon-pink));
+    transform: scale(1.25);
+
+    animation: neonPulse 2.3s infinite ease-in-out;
+}
+
+/* stronger glow when focused */
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="time"]:focus::-webkit-calendar-picker-indicator {
+    animation: neonPulse 1.2s infinite ease-in-out;
+    filter: invert(1) drop-shadow(0 0 16px var(--neon-pink));
+}
+
+
+
+/* ============================
+   🔘 BUTTONS
+   ============================ */
+.btn, .btn-small, .btn-clear {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    background: var(--neon-pink);
+    color: #000;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s ease;
+}
+
+.btn:hover, .btn-small:hover, .btn-clear:hover {
+    box-shadow: 0 0 15px var(--neon-pink);
+    transform: scale(1.05);
+}
+
+.btn-small {
+    padding: 6px 12px;
+}
+
+.btn-clear {
+    background: red;
+    color: white;
+}
+
+
+
+/* ============================
+   📄 TASK TABLE
+   ============================ */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.task-table th {
+    background: rgba(255, 0, 140, 0.15);
+    padding: 10px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+}
+
+.task-table td {
+    padding: 10px;
+    border-bottom: 1px solid #333;
+}
+
+
+
+/* ============================
+   🟣 STATUS BADGES
+   ============================ */
+.badge {
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #fff;
+}
+
+.badge.pending { background: orange; }
+.badge.done { background: green; }
+.badge.working { background: dodgerblue; }
+
+
+
+/* ============================
+   🗑️ ICON BUTTONS
+   ============================ */
+.edit-icon svg,
+.trash-btn svg {
+    transition: 0.2s ease;
+}
+
+.edit-icon:hover svg {
+    filter: drop-shadow(0 0 8px gold);
+}
+
+.trash-btn:hover svg {
+    filter: drop-shadow(0 0 8px red);
+}
+
+/* ============================
+   ⭐ TABLE ROW APPEAR ANIMATION
+   ============================ */
+
+@keyframes rowFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Apply animation to each row with staggered delay */
+.task-table tbody tr {
+    animation: rowFadeIn 0.5s ease forwards;
+    opacity: 0;
+    animation-delay: calc(var(--i) * 0.12s);
+}
+
+.task-table th,
+.task-table td {
+    text-align: center;
+    padding: 8px 12px;
+}
+
+
+/* ============================
+   ⭐ NEON HOVER EFFECT
+   ============================ */
+
+.task-table tbody tr:hover {
+    background: rgba(255, 0, 140, 0.1);
+    box-shadow: 0 0 10px var(--neon-pink);
+    transform: scale(1.02);
+    transition: 0.25s ease;
+}
+
+
+
+/* ============================
+   ⭐ OPTIONAL CYBER SLIDE HOVER
+   ============================ */
+
+.task-table tbody tr:hover td {
+    position: relative;
+}
+
+.task-table tbody tr:hover td::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 70%;
+    width: 2px;
+    background: var(--neon-pink);
+    box-shadow: 0 0 10px var(--neon-pink);
+    animation: neonSlide 0.4s ease forwards;
+}
+
+@keyframes neonSlide {
+    from { height: 0%; }
+    to { height: 70%; }
+}
+
+/* =====================================================
+   FIX: Input fields not clickable — raise form z-index
+===================================================== */
+
+.create-trip-card,
+.create-trip-card * {
+    position: relative !important;
+    z-index: 999999 !important;
+    pointer-events: auto !important;
+}
+
+/* =====================================================
+   FIX: Background overlays blocking input clicks
+===================================================== */
+
+canvas,
+#particles-js,
+.particles-js,
+.cyber-grid,
+.glowing-grid,
+.animated-grid,
+.neon-lines,
+.bg-overlay,
+.grid-overlay {
+    pointer-events: none !important;
+    z-index: 0 !important;
+}
+
+.trip-tasks-card {
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(255, 45, 220, 0.3);
+}
+
+/* Card for Share Trip */
+.trip-share-card {
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(255, 45, 220, 0.3);
+}
+
+
+/* Optional: smaller gap inside form inputs */
+.trip-share-card .form-control {
+    border-radius: 8px;
+    box-shadow: 0 0 8px transparent;
+}
+
+.trip-share-card .form-control:focus {
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+
+
 
 

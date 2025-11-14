@@ -2,42 +2,44 @@
 {% block title %}Trip Details{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <!-- Trip Info -->
-    <h2>{{ trip.title }} 🌍</h2>
-    <p><b>Destination:</b>             
-                {% for d in trip.destinations %}
-                    {{ d.name }}
-                {% endfor %}
-    </p>
-    <p><b>Dates:</b> {{ trip.start_date }} - {{ trip.end_date }}</p>
-    <p><b>Description:</b> {{ trip.description or "No description" }}</p>
+<div class="container mt-4 trip-details-page">
+
+    <!-- Trip Header -->
+    <h2 class="trip-title text-center">{{ trip.title }} 🌍</h2>
+
+    <div class="trip-info mt-4">
+        <p class="trip-details-text"><b>Destination:</b>
+            {% for d in trip.destinations %}
+                {{ d.name }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+
+        <p class="trip-details-text"><b>Dates:</b> {{ trip.start_date }} → {{ trip.end_date }}</p>
+
+        <p class="trip-details-text"><b>Description:</b>
+            {{ trip.description or "No description available." }}
+        </p>
+    </div>
+
     <hr>
 
-    <!-- Flash messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+    <!-- Share Trip Section -->
+<div class="trip-share-section mb-5">
 
-    <!-- Share Trip -->
-    <h5>👥 Share Trip</h5>
-    <form action="{{ url_for('trips.share_trip', trip_id=trip.id) }}" method="POST" class="d-flex mb-3">
-        <input type="text" name="username" placeholder="Friend username" required class="form-control me-2">
-        <button class="btn btn-info">Share</button>
-    </form>
+    <div class="card trip-share-card p-3 mb-3">
+        <h3 class="trip-section-title mb-3">Share This Trip</h3>
 
+        <form action="{{ url_for('trips.share_trip', trip_id=trip.id) }}" method="POST"
+              class="d-flex align-items-center gap-2">
+            <input type="text" name="username" placeholder="Friend's Username"
+                   class="form-control flex-grow-1" required>
+            <button class="btn-link btn-tasks" style="margin: auto; margin-top: 20px;">Share</button>
+        </form>
 
-    {% set participant_ids = trip.participants | map(attribute='id') | list %}
-        <p><b>Shared with:</b> 
-            {% if participant_ids|length == 1 and session['user_id'] in participant_ids %}
-            You (Solo Trip)
+        <p class="shared-with mt-3 mb-0">
+            <b>Shared with:</b>
+            {% if trip.participants|length == 1 and session['user_id'] in participant_ids %}
+                Only You (Solo Trip)
             {% else %}
                 {% for u in trip.participants %}
                     {% if u.id == session['user_id'] %}(You){% endif %}
@@ -45,87 +47,114 @@
                 {% endfor %}
             {% endif %}
         </p>
+    </div>
+
+</div>
+
     <hr>
 
-    <!-- Itinerary -->
-    <h3>🗓️ Itinerary</h3>
+    <!-- Itinerary Section -->
+    <h3 class="trip-section-title">Trip Itinerary</h3>
+
     {% if trip.itinerary|length == 0 %}
-        <p class="text-muted">No itinerary items yet.</p>
+        <p class="text-muted">No itinerary entries yet.</p>
     {% else %}
-        <ul class="list-group mb-3">
+        <ul class="list-group mb-4">
             {% for item in trip.itinerary %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
+                <li class="list-group-item itinerary-item d-flex justify-content-between align-items-start">
+
                     <div>
-                        <b>{{ item.title }}</b> ({{ item.date }})<br>
+                        <b>{{ item.title }}</b> — ({{ item.date }}) <br>
+
                         {% if item.location %}
-                            Location: {{ item.location }}<br>
-                        {% else %}
-                            No location<br>
+                            <small>📍 <b>Location:</b> {{ item.location }}</small><br>
                         {% endif %}
 
                         {% if item.notes %}
-                            Notes: {{ item.notes }}<br>
-                        {% else %}
-                            No notes<br>
+                            <small>📝 <b>Notes:</b> {{ item.notes }}</small><br>
                         {% endif %}
 
                         {% if item.time %}
-                            Due Time: {{ item.time }}<br>
-                        {% else %}
-                            No time<br>
+                            <small>⏰ <b>Time:</b> {{ item.time }}</small>
                         {% endif %}
                     </div>
-                    
-                    <div class="d-flex gap-2">
-                        <a href="{{ url_for('trips.edit_itinerary', item_id=item.id) }}" class="btn btn-secondary btn-sm">Edit</a>
-                    <form action="{{ url_for('trips.delete_itinerary', item_id=item.id) }}" method="POST" class="d-inline"
-                          onsubmit="return confirm('Delete this itinerary item?');">
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+
+                    <div class="d-flex flex-column gap-2 ms-3">
+                        <a href="{{ url_for('trips.edit_itinerary', item_id=item.id) }}"
+                           class="btn btn-sm btn-itinerary-edit">Edit</a>
+
+                        <form action="{{ url_for('trips.delete_itinerary', item_id=item.id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Delete this itinerary item?');">
+                            <button class="btn btn-sm btn-itinerary-delete">Delete</button>
+                        </form>
                     </div>
+
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
 
     <!-- Add Itinerary -->
-    <form action="{{ url_for('trips.add_itinerary', trip_id=trip.id) }}" method="POST" class="mb-4">
-        <h5>Add Itinerary Item</h5>
-        <input type="text" name="title" placeholder="Title" required class="form-control mb-2">
-        <input type="date" name="date" required class="form-control mb-2">
+    <h5 class="trip-section-title">Add New Itinerary Item</h5>
+
+    <form action="{{ url_for('trips.add_itinerary', trip_id=trip.id) }}"
+          method="POST" class="add-itinerary-form mb-5">
+
+        <input type="text" name="title" placeholder="Title" class="form-control mb-2" required>
+        <input type="date" name="date" class="form-control mb-2" required>
         <input type="time" name="time" class="form-control mb-2">
         <input type="text" name="location" placeholder="Location" class="form-control mb-2">
         <textarea name="notes" placeholder="Notes" class="form-control mb-2"></textarea>
-        <button type="submit" class="btn btn-success">Add Item</button>
+
+        <button type="submit" class="btn-add-itinerary">Add Item</button>
     </form>
 
     <hr>
 
     <!-- Budget Section -->
-    <h3>💰 Budget</h3>
+    <h3 class="trip-section-title">Budget Overview</h3>
+
     {% if not trip.budget %}
-        <p class="text-muted">No budget yet. Go to <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}">Budget Page</a>.</p>
+        <p class="text-muted">
+            No budget set.  
+            <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}">
+                Go to Budget Page
+            </a>.
+        </p>
     {% else %}
         <p>
-            <b>Total Planned:</b> {{ trip.budget.total_planned }} |
-            <b>Total Spent:</b> {{ trip.budget.total_spent }} |
+            <b>Total Planned:</b> {{ trip.budget.total_planned }} <br>
+            <b>Total Spent:</b> {{ trip.budget.total_spent }} <br>
             <b>Remaining:</b> {{ trip.budget.calculate_remaining() }}
         </p>
-        <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" class="btn btn-primary">📊 Manage Budget</a>
+
+        <a href="{{ url_for('trips.trip_budget', trip_id=trip.id) }}"
+           class="btn-manage-budget">
+            Manage Budget
+        </a>
     {% endif %}
+
+    <hr>
+
+    <!-- Tasks -->
+   
+<div class="card trip-tasks-card mb-5 p-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="trip-section-title">Related Tasks</h3>
+        <p class="mb-0">Manage your to-do list for this trip.</p>
+        <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-tasks">
+            Open Tasks
+        </a>
+    </div>
 </div>
 
-    <!-- Tasks Section -->
-    <hr>
-    <h3>🧾 Tasks</h3>
-    <p>Keep track of your to-do list for this trip.</p>
+    <div class="text-center mt-3">
+        <a href="{{ url_for('trips.view_trips') }}" class="btn-back" style="margin-top: 20px;">
+            ⬅ Back to Trips
+        </a>
+    </div>
 
-    <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-info">
-        ➕ Add Task
-    </a>
 
-    
-<div class="text-end mb-3">
-    <a href="{{ url_for('trips.view_trips') }}" class="btn btn-secondary mt-3">⬅ Back to Trips</a>
 </div>
 {% endblock %}

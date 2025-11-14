@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}My Favorite Destinations{% endblock %}
+
+{% block content %}
+
+<div class="favorites-container">
+
+    <div class="favorites-header">
+        <h1>❤️ My Favorite Destinations</h1>
+        <div>
+            <a href="{{ url_for('trips.add_favorite') }}" class="btn btn-primary">+ Add New Favorite</a>
+            <a href="{{ url_for('trips.popular_destinations') }}" class="btn btn-secondary">🔥 Popular</a>
+        </div>
+    </div>
+
+    <form action="{{ url_for('trips.search_favorites') }}" method="GET" class="search-bar">
+        <input type="text" name="q" placeholder="Search destinations or countries..." class="search-input">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if favorites %}
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number">{{ favorites|length }}</div>
+            <div class="stat-label">Favorite Places</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ favorites|map(attribute='country')|select|unique|list|length }}</div>
+            <div class="stat-label">Countries</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">🌍</div>
+            <div class="stat-label">Dream Destinations</div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if favorites %}
+    <div class="favorites-grid">
+        {% for destination in favorites %}
+        <div class="favorite-card">
+
+            <div class="favorite-image">
+                {% if destination.image_url %}
+                <img src="{{ destination.image_url }}" alt="{{ destination.name }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                <span>📍</span>
+                {% endif %}
+            </div>
+
+            <div class="favorite-content">
+                <div class="favorite-title">{{ destination.name }}</div>
+
+                {% if destination.country %}
+                <div class="favorite-country">🌍 {{ destination.country }}</div>
+                {% endif %}
+
+                {% if destination.description %}
+                <div class="favorite-description">
+                    {{ destination.description[:100] }}{% if destination.description|length > 100 %}...{% endif %}
+                </div>
+                {% endif %}
+
+                <div class="favorite-actions">
+                    <a href="{{ url_for('trips.edit_favorite', destination_id=destination.id) }}" class="btn btn-edit">Edit</a>
+
+                    <form action="{{ url_for('trips.remove_favorite', destination_id=destination.id) }}"
+                          method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-remove"
+                                onclick="return confirm('Remove {{ destination.name }} from favorites?');">
+                            Remove
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🗺️</div>
+        <h2>No favorites yet!</h2>
+        <p>Start building your dream destination list</p>
+        <a href="{{ url_for('trips.add_favorite') }}" class="btn btn-primary">Add Your First Favorite</a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+
+<div class="favorites-container">
+
+    <div class="favorites-header">
+        <h1>🔍 Search Results for "{{ query }}"</h1>
+        <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary">← Back to Favorites</a>
+    </div>
+
+    <form action="{{ url_for('trips.search_favorites') }}" method="GET" class="search-bar">
+        <input type="text" name="q" value="{{ query }}" class="search-input">
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {% if results %}
+    <p style="color:#666; margin-bottom:20px;">Found {{ results|length }} result(s)</p>
+
+    <div class="favorites-grid">
+        {% for destination in results %}
+        <div class="favorite-card">
+
+            <div class="favorite-image">
+                {% if destination.image_url %}
+                <img src="{{ destination.image_url }}" alt="{{ destination.name }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                <span>📍</span>
+                {% endif %}
+            </div>
+
+            <div class="favorite-content">
+                <div class="favorite-title">{{ destination.name }}</div>
+                {% if destination.country %}
+                <div class="favorite-country">🌍 {{ destination.country }}</div>
+                {% endif %}
+                {% if destination.description %}
+                <div class="favorite-description">
+                    {{ destination.description[:100] }}{% if destination.description|length > 100 %}...{% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">🔍</div>
+        <h2>No results found</h2>
+        <p>Try a different search term</p>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}
