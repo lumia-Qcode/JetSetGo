@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Favorite Destination{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <h1>✏️ Edit Favorite Destination</h1>
+    <p style="color:#666; margin-bottom:30px;">Update destination details</p>
+
+    <form action="{{ url_for('trips.edit_favorite', destination_id=destination.id) }}" method="POST">
+
+        <div class="form-group">
+            <label class="form-label">Destination Name *</label>
+            <input type="text" name="name" class="form-input" value="{{ destination.name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Country</label>
+            <input type="text" name="country" class="form-input" value="{{ destination.country or '' }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="description" class="form-textarea">{{ destination.description or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Image URL</label>
+            <input type="url" name="image_url" class="form-input" value="{{ destination.image_url or '' }}">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

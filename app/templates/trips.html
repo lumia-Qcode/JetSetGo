@@ -83,13 +83,15 @@
 
   <!-- Actions -->
   <div class="text-center mt-4">
-    <a href="{{ url_for('trips.create_trip') }}" class="btn btn-success">Create New Trip</a>
+    <a href="{{ url_for('trips.create_trip') }}" class="btn btn-success mb-3">Create New Trip</a>
   </div>
 
   <!-- Confirm delete all trips -->
-  <div class="text-center mt-4">
-    <a href="#" class="btn btn-danger" id="deleteAllBtn">🗑️ Delete All Trips</a>
-  </div>
+  {% if trip|length > 0 %}
+    <div class="text-center mt-2">
+      <a href="#" class="btn btn-danger" id="deleteAllBtn">Delete All Trips</a>
+    </div>
+  {% endif %}
 
   <!-- Hidden confirmation card -->
   <div id="deleteConfirmCard"

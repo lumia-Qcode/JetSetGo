@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Favorite Destination{% endblock %}
+
+{% block content %}
+
+<div class="form-container">
+
+    <h1>❤️ Add Favorite Destination</h1>
+    <p style="color:#666; margin-bottom:30px;">Save a destination to your favorites list</p>
+
+    <form action="{{ url_for('trips.add_favorite') }}" method="POST">
+
+        <div class="form-group">
+            <label for="name" class="form-label">Destination Name *</label>
+            <input type="text" id="name" name="name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+            <label for="country" class="form-label">Country</label>
+            <input type="text" id="country" name="country" class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="description" class="form-label">Description</label>
+            <textarea id="description" name="description" class="form-textarea"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image_url" class="form-label">Image URL (optional)</label>
+            <input type="url" id="image_url" name="image_url" class="form-input">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add to Favorites</button>
+            <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

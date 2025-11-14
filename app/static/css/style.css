@@ -1,562 +1,660 @@
-/* ==== Reset & Base ==== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", "Poppins", sans-serif;
+/* ----------------------------------------------------
+   IMPORT FONTS
+---------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ----------------------------------------------------
+   GLOBAL VARIABLES (NEON PINK CYBER THEME)
+---------------------------------------------------- */
+:root {
+    --bg-color: #000000;
+    --text-color: #f2f2f2;
+    --soft-text: #c7c7c7;
+
+    --card-bg: rgba(10, 10, 10, 0.8);
+    --border-color: #ff2ecc;
+    --neon-pink: #ff2ecc;
+    --neon-hover: #ff5be0;
 }
 
+/* ----------------------------------------------------
+   PAGE FADE-IN CYBER TRANSITION
+---------------------------------------------------- */
 body {
-  background-color: #f3f0ff;
-  color: #444;
-  line-height: 1.6;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: "Inter", sans-serif;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    animation: fadeIn 0.9s ease-out forwards;
 }
 
-/* ==== Header & Nav ==== */
+@keyframes fadeIn {
+    from { opacity: 0; filter: blur(10px); }
+    to   { opacity: 1; filter: blur(0px); }
+}
+
+a {
+    transition: opacity 0.3s ease;
+}
+a:active {
+    opacity: 0.3;
+}
+
+.container {
+    width: 90%;
+    max-width: 1150px;
+    margin: auto;
+}
+
+/* ----------------------------------------------------
+   BACKGROUND PARTICLES CANVAS
+---------------------------------------------------- */
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -4;
+    pointer-events: none !important; /* FIXED */
+}
+
+/* ----------------------------------------------------
+   CYBER GRID BACKGROUND
+---------------------------------------------------- */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(255, 20, 147, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 20, 147, 0.08) 1px, transparent 1px);
+    background-size: 55px 55px;
+    animation: gridMove 32s linear infinite;
+    z-index: -3;
+    pointer-events: none !important; /* FIXED */
+}
+
+@keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 500px 500px; }
+}
+
+/* ----------------------------------------------------
+   NAVBAR
+---------------------------------------------------- */
 header {
-  background-color: #a0c4ff;
-  color: #2c3e50; /* changed from white to dark charcoal */
-  padding: 20px 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    background: #0b0b0b;
+    padding: 18px 0;
+    border-bottom: 1px solid rgba(255, 20, 147, 0.3);
+    box-shadow: 0 0 20px rgba(255, 20, 147, 0.2);
+    position: relative;
+    z-index: 20; /* FIXED */
 }
 
 header .container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-header h1 {
-  font-size: 2rem;
-  margin-left: 20px;
-  color: #2c3e50; /* ensure header text is dark */
+.logo {
+    height: 70px;
+    filter: drop-shadow(0 0 12px var(--neon-pink));
 }
 
 nav a {
-  color: #34495e; /* darker blue-gray */
-  text-decoration: none;
-  margin: 0 15px;
-  font-weight: 500;
-  transition: color 0.3s ease;
+    margin-left: 30px;
+    text-decoration: none;
+    color: var(--soft-text);
+    font-size: 18px;
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 1px;
+    font-weight: 600;
+    padding: 10px 14px;
+    transition: 0.25s ease;
+    position: relative;
+    z-index: 20; /* FIXED */
 }
 
 nav a:hover {
-  color: #ffb5a7;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    transform: translateY(-2px);
 }
 
-/* ==== Main Content ==== */
-.container {
-  max-width: 960px;
-  margin: 30px auto;
-  padding: 20px;
-  background-color: #fff1e6;
-  border-radius: 12px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-  color: #333; /* slightly darker text for main content */
-}
-
-/* ==== Footer ==== */
-footer {
-  background-color: #cbaacb;
-  color: #2c3e50; /* changed from white to dark charcoal */
-  text-align: center;
-  padding: 15px;
-  margin-top: 60px;
-  box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.08);
-  font-weight: 500;
-}
-
-/* ==== Buttons ==== */
-.btn, .btn-small {
-  background-color: #cbaacb;
-  color: white;
-  border: none;
-  padding: 10px 16px;
-  margin-top: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.btn-small {
-  padding: 6px 12px;
-  font-size: 0.9rem;
-}
-
-.btn:hover, .btn-small:hover {
-  background-color: #ffb5a7;
-}
-
-.btn-clear {
-  background-color: #ffb5a7;
-  color: white;
-}
-
-.btn-clear:hover {
-  background-color: #f08080;
-}
-
-/* ==== Task Table ==== */
-.task-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 25px;
-  font-size: 0.95rem;
-  color: #2c3e50; /* dark charcoal text for table */
-}
-
-.task-table th, .task-table td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ccc;
-  vertical-align: middle;
-}
-
-.task-table th {
-  background-color: #a0c4ff;
-  color: #2c3e50; /* dark text instead of white */
-  font-weight: 600;
-}
-
-.task-table tr:nth-child(even) {
-  background-color: #f3f0ff;
-}
-
-.task-table tr:hover {
-  background-color: #ffb5a7;
-  color: white;
-}
-
-/* ==== Badge Styles ==== */
-.badge {
-  padding: 5px 10px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  text-transform: capitalize;
-}
-
-.badge.done {
-  background-color: #b7e4c7;
-  color: #1b4332;
-}
-
-.badge.pending {
-  background-color: #ffd6a5;
-  color: #8b5d33;
-}
-
-.badge.working {
-  background-color: #ffd6a5;
-  color: #8b5d33;
-}
-
-/* ==== Flash Messages ==== */
+/* ----------------------------------------------------
+   FLASH MESSAGES
+---------------------------------------------------- */
 .flash {
-  padding: 12px;
-  margin-bottom: 15px;
-  border-radius: 8px;
-  font-weight: 500;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border-radius: 8px;
+    font-weight: 500;
 }
 
-.flash.success {
-  background-color: #b7e4c7;
-  color: #1b4332;
+.flash.success { background: #1c6f3c; color: white; }
+.flash.danger   { background: #8c1c1c; color: white; }
+.flash.info { background: #1c3e6f; color: white; }
+
+/* ----------------------------------------------------
+   LOGIN & REGISTRATION BOX (3D + ANIMATED BORDER)
+---------------------------------------------------- */
+.login-box,
+.registration-box {
+    position: relative;
+    overflow: hidden;
+    z-index: 10; /* FIXED */
+
+    background: var(--card-bg);
+    padding: 45px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    margin: 90px auto;
+
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15),
+        5px 5px 25px rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(12px);
 }
 
-.flash.error {
-  background-color: #ffadad;
-  color: #6b0000;
+/* Animated Neon Border */
+.login-box::before,
+.registration-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 14px;
+    
+    background: linear-gradient(
+        120deg,
+        #ff2ecc,
+        #ff5be0,
+        #ff2ecc
+    );
+    background-size: 400% 400%;
+    animation: gradientMove 6s infinite linear;
+
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                  linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
 }
 
-.flash.info {
-  background-color: #cce5ff;
-  color: #084298;
+@keyframes gradientMove {
+    0%   { background-position: 0% 50%; }
+    100% { background-position: 300% 50%; }
 }
 
-/* Warning (yellow) */
-.flash.warning {
-  background-color: #fff3cd;
-  color: #664d03;
+.login-box h2,
+.registration-box h2 {
+    text-align: center;
+    color: var(--neon-pink);
+    font-size: 30px;
+    font-family: "Orbitron", sans-serif;
+    margin-bottom: 25px;
+    text-shadow: 0 0 15px var(--neon-pink);
+    position: relative;
+    z-index: 20; /* FIXED */
 }
 
-/* Auto fade animation */
-@keyframes fadeOut {
-  0%   { opacity: 1; transform: translateY(0); }
-  80%  { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); display: none; }
-}
-
-/* ==== Forms ==== */
-.task-form, .login-box form, .form-group {
-  margin-top: 20px;
-}
-
-input[type="text"], input[type="password"], input[type="email"] {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-}
-
+/* ----------------------------------------------------
+   FORM FIELDS
+---------------------------------------------------- */
 label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: #2c3e50; /* dark label text */
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+    position: relative;
+    z-index: 20;
 }
 
-/* ==== Login & Register ==== */
-.login-box {
-  background-color: #e7c6ff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-}
-
-.login-box h2 {
-  margin-bottom: 20px;
-  color: #4c0070;
-}
-
-.form-group {
-  margin-bottom: 20px;
+input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid #333;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+    position: relative;
+    z-index: 20;
 }
 
 input:focus {
-  outline: none;
-  border-color: #a0c4ff;
-  box-shadow: 0 0 5px rgba(160, 196, 255, 0.5);
+    border-color: var(--neon-pink);
+    outline: none;
+    box-shadow: 0 0 10px var(--neon-pink);
 }
 
-.trash-btn {
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    line-height: 1;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-
-/* Smaller icon (16x16) and white/grey color */
-.trash-btn svg {
-    width: 16px;
-    height: 16px;
-    fill: #d3d3d3; /* Light grey, or use #ffffff for white */
-    vertical-align: middle;
-}
-
-/* Optional: Change icon on hover (e.g., slightly darker grey or red) */
-.trash-btn:hover svg {
-    fill: #ff4c4c; /* light red on hover */
-    transform: scale(1.1);
-}
-
-/* ==== Responsive ==== */
-@media (max-width: 768px) {
-  header .container, footer .container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  nav a {
-    margin: 10px 5px;
-  }
-}
-
-/* Style date and time inputs in the task form */
-.task-form input[type="date"],
-.task-form input[type="time"] {
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-family: "Segoe UI", "Poppins", sans-serif;
-  color: #444;
-  background-color: white;
-  min-width: 150px;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  outline-offset: 2px;
-  outline-color: #a0c4ff;
-}
-
-.task-form input[type="date"]:focus,
-.task-form input[type="time"]:focus {
-  border-color: #a0c4ff;
-  box-shadow: 0 0 5px rgba(160, 196, 255, 0.6);
-}
-
-/* Responsive: stack inputs vertically on small screens */
-@media (max-width: 480px) {
-  .task-form input[type="date"],
-  .task-form input[type="time"] {
-    margin-left: 0;
-    margin-top: 10px;
-    width: 100%;
-    min-width: unset;
-  }
-}
-
+/* Password Wrapper Fix */
 .password-wrapper {
-  position: relative;
+    position: relative;
+    width: 100%;
+    z-index: 20;
 }
 
-.password-wrapper input[type="password"],
-.password-wrapper input[type="text"] {
-  width: 100%;
-  padding-right: 35px; /* Space for the icon */
-  box-sizing: border-box;
+.password-wrapper input {
+    padding-right: 42px;
 }
 
 .toggle-password {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.1em;
-  user-select: none;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--soft-text);
+    transition: 0.2s;
+    z-index: 25;
 }
 
-.about-card {
-  background-color: #fff1e6;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  max-width: 800px;
-  margin: 40px auto;
-  color: #2c3e50;
-  font-size: 1.1rem;
-  line-height: 1.6;
+.toggle-password:hover {
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
 }
 
-.about-card h2 {
-  margin-bottom: 20px;
-  font-size: 2rem;
-  color: #4c0070;
-  text-align: center;
+/* ----------------------------------------------------
+   BUTTONS
+---------------------------------------------------- */
+.btn {
+    width: 100%;
+    padding: 12px 0;
+    background: var(--neon-pink);
+    color: #000;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 0 12px var(--neon-pink);
+    position: relative;
+    z-index: 20;
 }
 
-.about-card h3 {
-  margin-top: 30px;
-  margin-bottom: 15px;
-  color: #6a0572;
+.btn:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 16px var(--neon-hover);
 }
 
-.about-card ul {
-  list-style-type: disc;
-  padding-left: 20px;
+/* Forgot Password */
+.btn-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    /*color: var(--neon-pink) !important;*/
+    font-size: 15px;
+    text-decoration: none;
+    transition: 0.2s ease;
+    position: relative;
+    z-index: 30 !important;
 }
 
-.about-card ul li {
-  margin-bottom: 10px;
+.btn-link:hover {
+    color: var(--neon-hover) !important;
+    text-shadow: 0 0 10px var(--neon-hover);
 }
 
 
-/*--------------------------*/
-/* logo styling */
-.logo {
-  max-width: 150px;
-  display: block;
-  margin: 0 0 0.8rem 0; 
+
+/* ----------------------------------------------------
+   FOOTER (Cute + Neon)
+---------------------------------------------------- */
+footer {
+    background: #0b0b0b;
+    padding: 25px 0;
+    text-align: center;
+    color: var(--soft-text);
+    border-top: 1px solid rgba(255, 20, 147, 0.25);
+    font-family: "Orbitron", sans-serif;
+    letter-spacing: 1px;
+
+    box-shadow:
+        0 -5px 25px rgba(255, 20, 147, 0.3),
+        inset 0 -5px 15px rgba(255, 20, 147, 0.2);
+
+    position: relative;
+    z-index: 20; /* FIXED */
 }
 
+footer:hover {
+    color: var(--neon-hover);
+    text-shadow: 0 0 15px var(--neon-pink);
+}
+
+/* ----------------------------------------------------
+   RESPONSIVE DESIGN
+---------------------------------------------------- */
+@media (max-width: 768px) {
+
+    header .container {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav {
+        margin-top: 12px;
+    }
+
+    .logo {
+        height: 85px;
+    }
+
+    nav a {
+        margin: 0 12px;
+        display: inline-block;
+    }
+
+    .login-box,
+    .registration-box {
+        margin-top: 50px;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+        padding: 30px 15px;
+    }
+
+    .card-icon {
+        font-size: 42px;
+    }
+
+    .card h3 {
+        font-size: 20px;
+    }
+}
+
+/* ----------------------------------------------------
+   FIXES FOR AUTOFILL STYLING (DARK THEME)
+---------------------------------------------------- */
+/* Autofill background fix for Chrome, Edge, Opera */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0px 1000px #1a1a1a inset !important; /* dark background */
+    -webkit-text-fill-color: #ffffff !important; /* white text */
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Autofill fix for Firefox */
+input:-moz-autofill {
+    box-shadow: 0 0 0px 1000px #1a1a1a inset !important;
+    -moz-text-fill-color: #ffffff !important; /* white text */
+}
+
+/* -----------------------
+   HOME PAGE CARDS 
+-------------------------- */
 .cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.8rem;
-  margin: 2.5rem 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 50px 20px;
+    max-width: 1200px;
+    margin: auto;
+    z-index: 10;
+    position: relative;
 }
 
 .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.6rem;
-  text-align: left;
-  text-decoration: none;
-  color: #222;
-
-  /* modern subtle shadow */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(10, 10, 10, 0.85);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px 20px;
+    text-align: center;
+    color: var(--text-color);
+    font-family: "Inter", sans-serif;
+    text-decoration: none;
+    box-shadow: 0 0 12px var(--neon-pink), inset 0 0 6px var(--neon-pink);
+    transition: 0.3s ease, transform 0.25s ease;
+    position: relative;
+    overflow: hidden;
 }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+.card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    padding: 2px;
+    background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
+    background-size: 400% 400%;
+    animation: gradientMove 6s infinite linear;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
 }
 
 .card-icon {
-  font-size: 1.8rem;
-  margin-bottom: 0.8rem;
-  color: #6c63ff; /* muted accent color */
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+    text-shadow: 0 0 12px var(--neon-pink);
+    z-index: 20;
+    position: relative;
 }
 
 .card h3 {
-  margin: 0.5rem 0;
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: #333;
+    font-size: 22px;
+    color: var(--neon-pink);
+    margin-bottom: 12px;
+    text-shadow: 0 0 10px var(--neon-pink);
+    z-index: 20;
+    position: relative;
 }
 
 .card p {
-  font-size: 0.95rem;
-  line-height: 1.4;
-  color: #666;
+    font-size: 15px;
+    color: var(--soft-text);
+    line-height: 1.5;
+    z-index: 20;
+    position: relative;
 }
 
-/*----------------------------*/
-
-/* ==== Trips Page ==== */
-.trip-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+.card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 20px var(--neon-hover), inset 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
 }
 
-.trip-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.4rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-  border: 1px solid rgba(0,0,0,0.05);
+/* ----------------------------------------------------
+   TRIPS PAGE
+---------------------------------------------------- */
+
+/* Trips Page Container */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 30px 15px;
+    position: relative;
+    z-index: 10;
 }
 
-.trip-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+/* Page Heading */
+.container h2 {
+    color: var(--neon-pink);
+    text-align: center;
+    font-family: "Orbitron", sans-serif;
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin-bottom: 40px;
 }
 
-.trip-card h5 {
-  font-size: 1.2rem;
-  margin-bottom: 0.2rem;
-  color: #4c0070;
+/* Flash Messages */
+.alert {
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(255, 45, 220, 0.3);
 }
 
-.trip-card h6 {
-  color: #6a0572;
-  font-weight: 500;
-  font-size: 0.95rem;
+.alert-info { background: rgba(10, 10, 10, 0.8); color: var(--neon-pink); }
+.alert-success { background: rgba(10, 10, 10, 0.8); color: #1c6f3c; }
+.alert-danger { background: rgba(10, 10, 10, 0.8); color: #ff4c4c; }
+
+/* Trips Grid Cards */
+.row .card {
+    background: rgba(10, 10, 10, 0.85);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 12px var(--neon-pink), inset 0 0 6px var(--neon-pink);
+    transition: 0.3s ease, transform 0.25s ease;
 }
 
-.trip-card p {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 0.5rem;
+.row .card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 20px var(--neon-hover), inset 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
 }
 
-/* Badge override */
-.trip-card .badge {
-  margin-top: 8px;
-  display: inline-block;
-  background-color: #a0c4ff;
-  color: #2c3e50;
-  font-size: 0.75rem;
-  padding: 5px 8px;
-  border-radius: 6px;
+/* Card Title and Subtitle */
+.row .card-title {
+    font-size: 20px;
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.row .card-subtitle {
+    color: var(--soft-text);
+    font-size: 14px;
+}
+
+/* Card Text */
+.row .card-text {
+    font-size: 14px;
+    color: var(--text-color);
+    margin-top: 10px;
+}
+
+/* Badges */
+.badge {
+    font-weight: 600;
+    font-size: 12px;
+    text-shadow: 0 0 6px var(--neon-pink);
 }
 
 /* Buttons inside cards */
-.trip-card .btn-sm {
-  margin-right: 6px;
+.card .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 0 10px var(--neon-pink);
 }
 
-/* ==== Trip Detail ==== */
-.trip-detail h2 {
-  font-size: 1.8rem;
-  color: #4c0070;
-  margin-bottom: 0.5rem;
-}
-
-.trip-detail p {
-  font-size: 1rem;
-  margin-bottom: 0.6rem;
-  color: #333;
-}
-
-/* Section titles */
-.trip-detail h3 {
-  font-size: 1.4rem;
-  margin-top: 2rem;
-  margin-bottom: 0.8rem;
-  color: #6a0572;
-}
-
-/* Itinerary list */
-.itinerary-list .list-group-item {
-  border-radius: 8px;
-  margin-bottom: 6px;
-  border: 1px solid #eee;
-}
-
-.itinerary-list .btn-sm {
-  padding: 4px 10px;
-  font-size: 0.85rem;
-}
-
-/* ==== Budget Page ==== */
-.budget-summary {
-  background-color: #e7c6ff;
-  padding: 1rem;
-  border-radius: 10px;
-  font-weight: 500;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.05);
-}
-
-.budget-summary p {
-  margin: 0.2rem 0;
-  font-size: 1rem;
-}
-
-/* Expenses list */
-.expense-list .list-group-item {
-  border-radius: 8px;
-  border: 1px solid #eee;
-  margin-bottom: 8px;
-}
-
-.expense-list b {
-  color: #4c0070;
-}
-
-/* Shared-with text */
-.expense-list p {
-  font-size: 0.85rem;
-  margin-top: 4px;
-  color: #555;
-}
-
-/* Add expense form */
-.add-expense-form {
-  background-color: #fff1e6;
-  padding: 1.2rem;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
-.add-expense-form h5 {
-  margin-bottom: 0.8rem;
-  color: #6a0572;
-}
-
-.edit-btn {
-    background: none;
+.card .btn-primary {
+    background: var(--neon-pink);
+    color: #000;
     border: none;
-    padding: 0;
-    cursor: pointer;
+}
+
+.card .btn-primary:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 14px var(--neon-hover);
+}
+
+.card .btn-warning {
+    background: #ffc107;
+    color: #000;
+    border: none;
+}
+
+.card .btn-warning:hover {
+    background: #ffdd57;
+    box-shadow: 0 0 14px #ffdd57;
+}
+
+/* Delete button as icon */
+.card .btn-link svg {
+    filter: drop-shadow(0 0 6px red);
     transition: transform 0.2s ease;
 }
 
-.edit-btn:hover svg {
-    transform: scale(1.2);
-    fill: #FFD700; /* brighter yellow on hover */
+.card .btn-link:hover svg {
+    transform: scale(1.1);
 }
 
+/* Create & Delete All Buttons */
+.text-center .btn-success,
+.text-center .btn-danger {
+    width: 200px;
+    margin: 10px auto;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px var(--neon-pink);
+    transition: 0.3s ease;
+}
+
+.text-center .btn-success:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 16px var(--neon-hover);
+}
+
+.text-center .btn-danger:hover {
+    background: #ff4c4c;
+    box-shadow: 0 0 16px #ff4c4c;
+}
+
+/* Delete Confirmation Card */
+#deleteConfirmCard {
+    background: rgba(10, 10, 10, 0.95);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px;
+    color: var(--text-color);
+    text-align: center;
+    box-shadow: 0 0 20px var(--neon-pink), inset 0 0 12px var(--neon-pink);
+}
+
+#deleteConfirmCard h4 {
+    color: #ff4c4c;
+    text-shadow: 0 0 12px #ff4c4c;
+}
+
+#deleteConfirmCard .btn-secondary {
+    background: #555;
+    color: #fff;
+}
+
+#deleteConfirmCard .btn-secondary:hover {
+    background: var(--neon-hover);
+    color: #000;
+}
+
+/* Form Inputs inside confirm card */
+#deleteConfirmCard input {
+    background: #0a0a0a;
+    color: #ffffff;
+    border: 1px solid var(--neon-pink);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+#deleteConfirmCard input:focus {
+     border-color: var(--neon-pink);
+    box-shadow: 0 0 12px var(--neon-pink);
+    outline: none;
+}
 
 

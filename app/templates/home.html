@@ -1,34 +1,33 @@
 {% extends 'base.html' %}
+
 {% block title %}Home{% endblock %}
 
 {% block content %}
 <section class="cards">
-  <!-- Create a Trip -->
+
   <a href="{{ url_for('trips.view_trips') }}" class="card">
     <div class="card-icon">✈️</div>
     <h3>Create a Trip</h3>
     <p>Plan your next adventure by adding destinations and dates.</p>
   </a>
 
-  <!-- Trip Checklist -->
   <a href="{{ url_for('tasks.view_tasks') }}" class="card">
     <div class="card-icon">📝</div>
     <h3>Trip Checklist</h3>
     <p>Stay organized with a travel-ready to-do list.</p>
   </a>
 
-  <!-- Write a Review -->
   <a href="{{ url_for('tasks.view_tasks') }}" class="card">
     <div class="card-icon">⭐</div>
     <h3>Write a Review</h3>
     <p>Share your travel experiences and tips with others.</p>
   </a>
 
-  <!-- Favourite Landmarks -->
-  <a href="{{ url_for('tasks.view_tasks') }}" class="card">
-    <div class="card-icon">📍</div>
-    <h3>Favourite Landmarks</h3>
+  <a href="{{ url_for('trips.view_favorites') }}" class="card">
+    <div class="card-icon">❤️</div>
+    <h3>Favourite Destinations</h3>
     <p>Save and revisit places you never want to forget.</p>
   </a>
+
 </section>
 {% endblock %}
