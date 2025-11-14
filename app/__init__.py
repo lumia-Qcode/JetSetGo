@@ -36,8 +36,8 @@ def create_app():
         MAIL_PORT=587,
         MAIL_USE_TLS=True,
         MAIL_USE_SSL=False,
-        MAIL_USERNAME='your@gmail.com',
-        MAIL_PASSWORD='your-email-password'
+        MAIL_USERNAME='lumiaqureshi796@gmail.com',
+        MAIL_PASSWORD='hhvd rhwm kbvf fmsa'
     )
     mail.init_app(app)
 
