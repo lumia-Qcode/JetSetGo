@@ -2,54 +2,54 @@
 {% block title %}Edit Expense{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h3>✏️ Edit Expense</h3>
-    <p class="text-muted">Trip: {{ expense.budget.trip.title }}</p>
-    <hr>
+<div class="container mt-4 edit-trip-card">
+    <h3 class="edit-trip-heading">Edit Expense for {{ expense.budget.trip.title }}</h3>
 
-    <form method="POST" class="card p-4 shadow-sm">
+    <form method="POST" class="edit-trip-form">
         <!-- Amount -->
         <div class="mb-3">
-            <label for="amount" class="form-label"><b>Amount ($)</b></label>
+            <label for="amount" class="edit-label"><b>Amount</b></label>
             <input type="number" name="amount" id="amount" step="0.01" min="0"
-                   value="{{ expense.amount }}" required class="form-control">
+                   value="{{ expense.amount }}" required class="edit-input">
         </div>
 
         <!-- Category -->
         <div class="mb-3">
-            <label for="category" class="form-label"><b>Category</b></label>
-            <select name="category" id="category" class="form-select mb-2">
+            <label for="category" class="edit-label"><b>Category</b></label>
+            <div class="select-wrapper mb-2">
+            <select name="category" id="category" class="form-select mb-2 edit-input">
                 <option value="" disabled>-- Select a Category --</option>
                 {% set categories = ["Food", "Transport", "Accommodation", "Shopping", "Entertainment", "Miscellaneous"] %}
                 {% for cat in categories %}
                     <option value="{{ cat }}" {% if expense.category == cat %}selected{% endif %}>{{ cat }}</option>
                 {% endfor %}
             </select>
+            </div>
 
-            <input type="text" id="customCategory" class="form-control" placeholder="Or type a custom category"
+            <input type="text" id="customCategory" class="edit-input" placeholder="Or type a custom category"
                    value="{% if expense.category not in categories %}{{ expense.category }}{% endif %}">
         </div>
 
         <!-- Description -->
         <div class="mb-3">
-            <label for="description" class="form-label"><b>Description</b></label>
+            <label for="description" class="edit-label"><b>Description</b></label>
             <input type="text" name="description" id="description"
-                   value="{{ expense.description }}" class="form-control">
+                   value="{{ expense.description }}" class="edit-input">
         </div>
 
         <!-- Shared With -->
         <div class="mb-3">
-            <label for="shared_with" class="form-label"><b>Shared With</b></label>
+            <label for="shared_with" class="edit-label"><b>Shared With</b></label>
             <input type="text" name="shared_with" id="shared_with"
-                   value="{{ expense.shared_users | map(attribute='username') | join(', ') }}" class="form-control"
+                   value="{{ expense.shared_users | map(attribute='username') | join(', ') }}" class="edit-input"
                    placeholder="Comma-separated usernames (optional)">
         </div>
 
         <!-- Buttons -->
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success">Save Changes</button>
+        <div class="d-flex justify-content-between edit-buttons">
+            <button type="submit" class="btn btn-save">Save Changes</button>
             <a href="{{ url_for('trips.trip_budget', trip_id=expense.budget.trip.id) }}" 
-               class="btn btn-secondary ms-2">Cancel</a>
+               class="btn-link cancel-btn">Cancel</a>
         </div>
     </form>
 </div>

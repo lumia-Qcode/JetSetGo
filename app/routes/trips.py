@@ -90,7 +90,7 @@ def edit_trip(trip_id):
         )
 
         flash("Trip updated successfully!", "success")
-        return redirect(url_for("trips.trip_detail", trip_id=trip.id))
+        return redirect(url_for("trips.view_trips", trip_id=trip.id))
     
     return render_template("edit_trip.html", trip=trip)
 
@@ -247,11 +247,12 @@ def edit_itinerary(item_id):
         if date:
             date = datetime.strptime(date, "%Y-%m-%d").date()
         if time:
+            time = time[:5]
             time = datetime.strptime(time, "%H:%M").time()
 
         item.update(title=title, date=date, location=location, notes=notes, time=time)
         flash("Itinerary item updated!", "success")
-        return redirect(url_for("trips.trip_detail", trip_id=item.trip_id))
+        return redirect(url_for("trips.all_itineraries", trip_id=item.trip_id))
     
     trip = item.trip
     return render_template("edit_itinerary.html", item=item, trip=trip)
@@ -267,11 +268,16 @@ def delete_itinerary(item_id):
 
     if user_id not in item.trip.get_participant_ids():
         flash("You do not have permission to delete this itinerary item.", "danger")
-        return redirect(url_for("trips.trip_detail", trip_id=trip_id))
+        return redirect(url_for("trips.all_itineraries", trip_id=trip_id))
 
     item.delete()
     flash("Itinerary item deleted!", "success")
-    return redirect(url_for("trips.trip_detail", trip_id=trip_id))
+    return redirect(url_for("trips.all_itineraries", trip_id=trip_id))
+#==========================================================================================================
+@trips_bp.route('/trip/<int:trip_id>/itineraries')
+def all_itineraries(trip_id):
+    trip = Trip.query.get_or_404(trip_id)
+    return render_template('all_itineraries.html', trip=trip)
 
 #==========================================================================================================
 # BUDGET ROUTES

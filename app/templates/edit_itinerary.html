@@ -2,17 +2,49 @@
 {% block title %}Edit Itinerary{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-  <h3>Edit Itinerary Item for {{ trip.title }}</h3>
-  <form action="{{ url_for('trips.edit_itinerary', item_id=item.id) }}" method="POST">
-      <input type="text" name="title" value="{{ item.title }}" required class="form-control mb-2">
-      <input type="date" name="date" value="{{ item.date }}" required class="form-control mb-2">
-      <input type="time" name="time" value="{{ item.time }}" class="form-control mb-2">
-      <input type="text" name="location" value="{{ item.location }}" class="form-control mb-2">
-      <textarea name="notes" class="form-control mb-2">{{ item.notes }}</textarea>
+<div class="container mt-4 edit-trip-card">
 
-      <button type="submit" class="btn btn-success">Save Changes</button>
-      <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn btn-secondary">Cancel</a>
+  <h3 class="edit-trip-heading">Edit Itinerary Item - {{ trip.title }}</h3>
+
+  <form action="{{ url_for('trips.edit_itinerary', item_id=item.id) }}" method="POST" class="edit-trip-form">
+
+      <!-- Title -->
+    <div class="form-group mb-3">
+      <label class="edit-label"><b>Title</b></label>
+      <input type="text" name="title" value="{{ item.title }}" required class="edit-input">
+    </div>
+
+      <!-- Date -->
+    <div class="col-md-6 mb-3">
+      <label class="edit-label">Date</label>
+      <input type="date" name="date" value="{{ item.date }}" required class="edit-input">
+    </div>
+
+      <!-- Time -->
+    <div class="col-md-6 mb-3">
+      <label class="edit-label"><b>Time</b></label>
+      <input type="time" name="time" value="{{ item.time }}" class="edit-input">
+    </div>
+
+      <!-- Location -->
+    <div class="form-group mb-3">
+      <label class="edit-label"><b>Location</b></label>
+      <input type="text" name="location" value="{{ item.location }}" class="edit-input">
+    </div>
+
+      <!-- Notes -->
+    <div class="form-group mb-3">
+      <label class="edit-label"><b>Notes</b></label>
+      <textarea name="notes" rows="3" class="edit-textarea">{{ item.notes }}</textarea>
+    </div>
+
+      <!-- Buttons -->
+      <div class="d-flex justify-content-between edit-buttons">
+        <button type="submit" class="btn btn-save">Save Changes</button>
+        <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn-link cancel-btn">Cancel</a>
+      </div>
+
   </form>
+
 </div>
 {% endblock %}

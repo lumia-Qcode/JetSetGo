@@ -7,9 +7,9 @@
     <form method="POST" action="{{ url_for('trips.create_trip') }}">
       <input type="text" name="title" placeholder="Trip Title"  class="form-control mb-3">
       <input type="text" name="destinations" placeholder="Enter destinations (comma-separated)"  class="form-control mb-3">
-      <label>Start Date</label>
+      <label><b>Start Date</b></label>
       <input type="date" name="start_date"  class="form-control mb-3">
-      <label>End Date</label>
+      <label><b>End Date</b></label>
       <input type="date" name="end_date"  class="form-control mb-3">
       <textarea name="description" placeholder="Description" class="form-control mb-3"></textarea>
       <button type="submit" class="btn create-trip-btn w-100">Create Trip</button>

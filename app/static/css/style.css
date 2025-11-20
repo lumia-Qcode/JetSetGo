@@ -356,9 +356,11 @@ input[type="time"]:focus::-webkit-calendar-picker-indicator {
 }
 
 /* Forgot Password */
+
 .btn-link {
     display: block;
     text-align: center;
+    width: auto;
     margin-top: 20px;
     /*color: var(--neon-pink) !important;*/
     font-size: 15px;
@@ -618,47 +620,78 @@ input:-moz-autofill {
     font-size: 12px;
     text-shadow: 0 0 6px var(--neon-pink);
 }
-
-/* Buttons inside cards */
+/* --------------------------------------------------
+   Base Card Buttons (Transparent Neon Outline)
+-------------------------------------------------- */
 .card .btn {
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 6px;
+    background: transparent !important;
+    border-radius: 8px;
     font-weight: 600;
-    box-shadow: 0 0 10px var(--neon-pink);
+    padding: 8px 16px;
+    font-size: 15px;
+    transition: 0.25s ease;
+    border: 2px solid transparent;
+    box-shadow: none !important;
 }
 
+/* --------------------------------------------------
+   VIEW BUTTON — Neon Pink Outline
+-------------------------------------------------- */
 .card .btn-primary {
-    background: var(--neon-pink);
-    color: #000;
-    border: none;
+    border-color: var(--neon-pink);
+    color: var(--neon-pink) !important;
+    text-shadow: 0 0 6px var(--neon-pink);
+    filter: drop-shadow(0 0 6px var(--neon-pink));
 }
 
 .card .btn-primary:hover {
-    background: var(--neon-hover);
-    box-shadow: 0 0 14px var(--neon-hover);
+    transform: scale(1.07);
+    color: #000 !important;
+    background: var(--neon-pink) !important;
+    text-shadow: none;
+    filter: drop-shadow(0 0 14px var(--neon-hover));
 }
 
+/* --------------------------------------------------
+   EDIT BUTTON — Neon Yellow Outline
+-------------------------------------------------- */
 .card .btn-warning {
-    background: #ffc107;
-    color: #000;
-    border: none;
+    border-color: #ffdd57;
+    color: #ffdd57 !important;
+    text-shadow: 0 0 6px #ffdd57;
+    filter: drop-shadow(0 0 6px #ffdd57);
 }
 
 .card .btn-warning:hover {
-    background: #ffdd57;
-    box-shadow: 0 0 14px #ffdd57;
+    transform: scale(1.07);
+    color: #000 !important;
+    background: #ffdd57 !important;
+    text-shadow: none;
+    filter: drop-shadow(0 0 14px #ffe680);
 }
 
-/* Delete button as icon */
-.card .btn-link svg {
-    filter: drop-shadow(0 0 6px red);
-    transition: transform 0.2s ease;
+/* Trash button reset */
+.btn-trash {
+    background: transparent !important;
+    border: none;
+    padding: 0;
+    width: auto;
+    cursor: pointer;
 }
 
-.card .btn-link:hover svg {
-    transform: scale(1.1);
+/* Neon glowing trash icon */
+.btn-trash .trash-icon {
+    filter: drop-shadow(0 0 8px hotpink);
+    transition: 0.25s ease;
 }
+
+/* Hover animation */
+.btn-trash:hover .trash-icon {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 14px hotpink);
+}
+
+
 
 /* Create & Delete All Buttons */
 .text-center .btn-success,
@@ -1185,65 +1218,151 @@ input:-moz-autofill {
     font-size: 16px;
 }
 
-/* -----------------------------------------------
-   ITINERARY LIST
------------------------------------------------- */
-.itinerary-item {
-    background: rgba(10, 10, 10, 0.85) !important;
-    color: var(--text-color) !important;
-    border: 1px solid var(--neon-pink) !important;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(255, 45, 220, 0.3);
+/* -----------------------------------------------------
+   BIG ITINERARY CARD — Animated Neon Border
+----------------------------------------------------- */
+.itinerary-big-card {
+    position: relative;
+    background: rgba(10, 10, 16, 0.8);
+    padding: 30px;
+    border-radius: 14px;
+    margin-bottom: 40px;
+    overflow: hidden;
 }
 
-/* Edit Button */
-.btn-itinerary-edit {
-    background: var(--neon-pink) !important;
-    color: #000 !important;
-    border: none !important;
-    padding: 6px 12px !important;
+.itinerary-big-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 2px;
+    border-radius: 14px;
+    background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
+    background-size: 400% 400%;
+    animation: gradientMove 6s linear infinite;
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 2;
+}
+
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
+}
+
+/* Heading */
+.itinerary-main-heading,
+.add-itinerary-heading {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 15px var(--neon-pink);
+    text-align: center;
+    margin-bottom: 25px;
+    position: relative;
+    z-index: 10;
+}
+
+
+/* -----------------------------------------------------
+   MINI ITINERARY CARDS
+----------------------------------------------------- */
+.itinerary-mini-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+    margin-bottom: 40px;
+}
+
+.itinerary-mini-card {
+    background: #0a0a0f;
+    border: 1px solid var(--neon-pink);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 0 12px rgba(255, 45, 220, 0.25);
+    transition: 0.25s ease;
+    position: relative;
+    z-index: 5;
+}
+
+.itinerary-mini-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 18px rgba(255, 45, 220, 0.45);
+}
+
+/* Mini card title */
+.mini-title {
+    color: var(--neon-pink);
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* Mini card text */
+.mini-text,
+.mini-date {
+    color: var(--soft-text);
+    margin-bottom: 4px;
+}
+
+
+/* Buttons container */
+.mini-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+
+/* -----------------------------------------------------
+   ADD FORM — Same as Edit Trip Form
+----------------------------------------------------- */
+.edit-trip-form .edit-input,
+.edit-trip-form .edit-textarea {
+    width: 100%;
+    padding: 12px 14px;
     border-radius: 8px;
-    font-size: 14px;
-    box-shadow: 0 0 10px var(--neon-pink);
+    background: #0a0a0a;
+    color: var(--text-color);
+    border: 1px solid var(--neon-pink);
+    margin-bottom: 15px;
+    box-sizing: border-box;
+    transition: 0.2s ease;
 }
 
-.btn-itinerary-edit:hover {
-    background: var(--neon-hover) !important;
-}
-
-/* Delete Button */
-.btn-itinerary-delete {
-    background: #ff3c3c !important;
-    color: #000 !important;
-    border: none !important;
-    padding: 6px 12px !important;
-    border-radius: 8px;
-    font-size: 14px;
-    box-shadow: 0 0 10px red;
-}
-
-.btn-itinerary-delete:hover {
-    background: #ff5e5e !important;
-}
-
-/* -----------------------------------------------
-   ADD ITINERARY FORM
------------------------------------------------- */
-.btn-add-itinerary {
-    background: var(--neon-pink) !important;
-    border: none !important;
-    color: #000 !important;
-    width: 180px;
-    font-weight: 600;
-    border-radius: 8px;
-    padding: 10px 0;
+.edit-trip-form .edit-input:focus,
+.edit-trip-form .edit-textarea:focus {
+    border-color: var(--neon-pink);
     box-shadow: 0 0 12px var(--neon-pink);
 }
 
-.btn-add-itinerary:hover {
-    background: var(--neon-hover) !important;
-    box-shadow: 0 0 16px var(--neon-hover);
+.edit-trip-form .edit-label {
+    display: block;
+    text-align: left;
+    color: var(--soft-text);
+    font-weight: 500;
+    margin-bottom: 6px;
+    font-size: 14px;
 }
+
+/* Textarea */
+.edit-trip-form .edit-textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* Buttons (use global neon buttons) */
+.btn-primary {
+    background: var(--neon-pink) !important;
+    color: #000 !important;
+    border: none !important;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.btn-primary:hover {
+    background: var(--neon-hover) !important;
+    box-shadow: 0 0 18px var(--neon-hover);
+}
+
+
 
 /* -----------------------------------------------
    BUDGET SECTION
@@ -1290,6 +1409,7 @@ input:-moz-autofill {
     color: black;
     transition: 0.2s;
     display: inline-block;
+    font-weight: 400;
 }
 
 .btn-back:hover {
@@ -1614,7 +1734,703 @@ canvas,
     box-shadow: 0 0 10px var(--neon-pink);
 }
 
+/* ----------------------------------------------------
+   MANAGE BUDGET CONTAINER
+---------------------------------------------------- */
+.manage-budget-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 30px;
+    background: transparent;
+    border: 2px solid var(--neon-pink);
+    border-radius: 16px;
+    box-shadow: 0 0 20px var(--neon-pink), inset 0 0 12px rgba(255, 20, 147, 0.2);
+    position: relative;
+}
 
+/* Heading */
+.manage-budget-container h2 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-align: center;
+    font-size: 28px;
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin-bottom: 15px;
+}
 
+/* Budget Info Paragraphs */
+.manage-budget-container p {
+    font-size: 16px;
+    color: var(--soft-text);
+    margin: 5px 0;
+    text-align: center;
+}
+
+/* Horizontal line */
+.manage-budget-container hr {
+    border: 0;
+    height: 1px;
+    background: rgba(255, 20, 147, 0.3);
+    margin: 20px 0;
+}
+
+/* Summary Card */
+.manage-budget-summary-card {
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    padding: 20px 25px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--soft-text);
+    text-align: center;
+    box-shadow: 0 0 14px var(--neon-pink), inset 0 0 8px rgba(255, 20, 147, 0.15);
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    position: relative;
+}
+
+.manage-budget-summary-card p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.manage-budget-summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px var(--neon-hover), inset 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* ----------------------------------------------------
+   PLANNED BUDGETS
+---------------------------------------------------- */
+
+/* Heading */
+.manage-budget-container h3 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 15px;
+    font-size: 22px;
+    text-align: left;
+}
+
+/* Empty message */
+.manage-budget-container p.mb-0 {
+    font-size: 15px;
+    color: var(--soft-text);
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+/* Planned budgets list */
+.manage-planned-budgets-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Individual planned budget items */
+.manage-planned-budgets-list .list-group-item {
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 0 12px var(--neon-pink), inset 0 0 6px rgba(255, 20, 147, 0.15);
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.manage-planned-budgets-list .list-group-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px var(--neon-hover), inset 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Category and amount */
+.manage-planned-budgets-list .list-group-item div:first-child {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+/* Buttons container */
+.manage-planned-budgets-list .list-group-item div:last-child a,
+.manage-planned-budgets-list .list-group-item div:last-child button {
+    margin-left: 8px;
+    font-size: 14px;
+    padding: 6px 12px;
+    min-width: 70px; /* Ensure buttons have same width */
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 0 8px var(--neon-pink);
+    transition: 0.25s ease;
+    text-decoration: none; /* Remove underline */
+    text-align: center;
+}
+
+/* Edit button */
+.manage-planned-budgets-list .list-group-item div:last-child .btn-primary {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+    min-width: 70px; /* Consistent width */
+}
+
+.manage-planned-budgets-list .list-group-item div:last-child .btn-primary:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Delete button */
+.manage-planned-budgets-list .list-group-item div:last-child .btn-danger {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+    min-width: 70px; /* Match edit button width */
+}
+
+.manage-planned-budgets-list .list-group-item div:last-child .btn-danger:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* ----------------------------------------------------
+   ADD PLANNED BUDGET CARD
+---------------------------------------------------- */
+.manage-budget-add-planned-card {
+    background: rgba(10, 10, 10, 0.9);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 18px var(--neon-pink), inset 0 0 12px rgba(255, 20, 147, 0.15);
+    position: relative;
+    z-index: 10;
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.manage-budget-add-planned-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px var(--neon-hover), inset 0 0 14px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Card heading */
+.manage-budget-add-planned-card h5 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 20px;
+    font-size: 20px;
+    text-align: center;
+}
+
+/* Form controls */
+.manage-budget-add-planned-card input.form-control,
+.manage-budget-add-planned-card select.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--neon-pink);
+    background: #0a0a0a;
+    color: var(--text-color);
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+}
+
+.manage-budget-add-planned-card input.form-control:focus,
+.manage-budget-add-planned-card select.form-select:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 12px var(--neon-pink);
+    outline: none;
+}
+
+/* Labels */
+.manage-budget-add-planned-card label {
+    display: block;
+    color: var(--soft-text);
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+/* Submit button */
+.manage-budget-add-planned-card .btn-success {
+    width: 100%;
+    padding: 12px 0;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 14px var(--neon-pink);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.manage-budget-add-planned-card .btn-success:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .manage-budget-add-planned-card {
+        padding: 20px;
+    }
+}
+
+/* ----------------------------------------------------
+   CATEGORY DROPDOWN (Select Box)
+---------------------------------------------------- */
+
+.manage-budget-add-planned-card select.form-select {
+    appearance: none; /* Remove default browser arrow */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    background: #0a0a0f;
+    color: var(--text-color);
+    border: 1px solid var(--neon-pink);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: inset 0 0 8px rgba(255, 20, 147, 0.15);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Glow on focus */
+.manage-budget-add-planned-card select.form-select:focus {
+    outline: none;
+    border-color: var(--neon-hover);
+    box-shadow: 0 0 12px var(--neon-hover);
+}
+
+/* Dropdown arrow (custom) */
+.manage-budget-add-planned-card select.form-select {
+    background-image: linear-gradient(45deg, var(--neon-pink) 50%, transparent 50%),
+                      linear-gradient(135deg, var(--neon-pink) 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(50% - 4px),
+                         calc(100% - 15px) calc(50% + 4px);
+    background-size: 6px 6px, 6px 6px;
+    background-repeat: no-repeat;
+}
+
+/* Options inside dropdown */
+.manage-budget-add-planned-card select.form-select option {
+    background: #0a0a0f;
+    color: var(--text-color);
+    padding: 10px;
+    font-size: 15px;
+}
+
+/* On hover inside dropdown list (supported by most modern browsers) */
+.manage-budget-add-planned-card select.form-select option:hover {
+    background: var(--neon-pink);
+    color: black;
+}
+
+/* ----------------------------------------------------
+   CHART CARD
+---------------------------------------------------- */
+.manage-budget-chart-card {
+    background: rgba(10, 10, 10, 0.9);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    text-align: center;
+
+    box-shadow: 0 0 18px var(--neon-pink),
+                inset 0 0 12px rgba(255, 20, 147, 0.15);
+
+    transition: 0.3s ease;
+    position: relative;
+}
+
+.manage-budget-chart-card:hover {
+    box-shadow: 0 0 24px var(--neon-hover),
+                inset 0 0 14px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Heading inside chart card */
+.manage-budget-chart-card h5 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 15px;
+    font-size: 20px;
+}
+
+/* Make ONLY this page's export CSV button small */
+.manage-budget-container .btn.btn-info {
+    background: var(--neon-pink) !important;
+    color: #000 !important;
+    border: none !important;
+
+    font-weight: 600;
+    font-size: 13px !important;
+    width: auto !important;
+
+    padding: 5px 12px !important;  /* Smaller */
+    border-radius: 6px !important;
+
+    box-shadow: 0 0 10px var(--neon-pink);
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.manage-budget-container .btn.btn-info:hover {
+    background: var(--neon-hover) !important;
+    box-shadow: 0 0 14px var(--neon-hover);
+}
+
+/* ----------------------------------------------------
+   EXPENSES SECTION
+---------------------------------------------------- */
+
+/* Heading */
+.manage-budget-container h3 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+/* Empty message */
+.manage-budget-container p.text-muted {
+    font-size: 15px;
+    color: var(--soft-text);
+}
+
+/* Expenses list container */
+.manage-expenses-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Each expense item card */
+.manage-expenses-list .list-group-item {
+    background: rgba(10, 10, 10, 0.85);
+    border: 1px solid var(--neon-pink);
+    border-radius: 12px;
+    padding: 15px 20px;
+    margin-bottom: 12px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    box-shadow: 0 0 12px var(--neon-pink),
+                inset 0 0 6px rgba(255, 20, 147, 0.15);
+
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.manage-expenses-list .list-group-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 20px var(--neon-hover),
+                inset 0 0 12px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Expense description + amount */
+.manage-expenses-list .list-group-item div:first-child {
+    color: var(--text-color);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+/* Shared-with text */
+.manage-expenses-list .list-group-item p.mb-1 {
+    color: var(--soft-text);
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+/* ------- BUTTONS ------- */
+
+/* Shared rules (edit, delete, leave, accept, reject) */
+.manage-expenses-list .list-group-item div:last-child a,
+.manage-expenses-list .list-group-item div:last-child button {
+    margin-left: 8px;
+    min-width: 75px;
+    font-size: 13px;
+    padding: 6px 12px;
+
+    border-radius: 6px;
+    font-weight: 600;
+
+    text-decoration: none;
+    text-align: center;
+
+    box-shadow: 0 0 8px var(--neon-pink);
+    transition: 0.25s ease;
+}
+
+/* Edit button */
+.manage-expenses-list .list-group-item .btn-primary {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+}
+.manage-expenses-list .list-group-item .btn-primary:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-hover);
+}
+
+/* Delete button */
+.manage-expenses-list .list-group-item .btn-danger {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+}
+.manage-expenses-list .list-group-item .btn-danger:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-hover);
+}
+
+/* Leave button */
+.manage-expenses-list .list-group-item .btn-warning {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+}
+.manage-expenses-list .list-group-item .btn-warning:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 12px var(--neon-hover);
+}
+
+/* Accept button */
+.manage-expenses-list .btn-success {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+}
+.manage-expenses-list .btn-success:hover {
+    background: var(--neon-pink);
+    color: #000;
+}
+
+/* Reject button */
+.manage-expenses-list .btn-warning.btn-sm {
+    background: transparent;
+    color: var(--neon-pink);
+    border: 2px solid var(--neon-pink);
+}
+.manage-expenses-list .btn-warning.btn-sm:hover {
+    background: var(--neon-pink);
+    color: #000;
+}
+
+/* ----------------------------------------------------
+   ADD EXPENSE CARD
+---------------------------------------------------- */
+.manage-budget-add-expense-card {
+    background: rgba(10, 10, 10, 0.9);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 0 18px var(--neon-pink), inset 0 0 12px rgba(255, 20, 147, 0.15);
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.manage-budget-add-expense-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px var(--neon-hover), inset 0 0 14px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+.manage-budget-add-expense-card h5 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-bottom: 20px;
+    font-size: 20px;
+    text-align: center;
+}
+
+/* Form controls */
+.manage-budget-add-expense-card input.form-control {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--neon-pink);
+    background: #0a0a0a;
+    color: var(--text-color);
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    transition: 0.2s ease;
+}
+
+.manage-budget-add-expense-card input.form-control:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 12px var(--neon-pink);
+    outline: none;
+}
+
+/* Submit button */
+.manage-budget-add-expense-card .btn-success {
+    width: 100%;
+    padding: 12px 0;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 14px var(--neon-pink);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.manage-budget-add-expense-card .btn-success:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+    color: #000;
+}
+
+/* ----------------------------------------------------
+   BACK TO TRIP DETAILS BUTTON
+---------------------------------------------------- */
+.text-end a.btn-outline-secondary {
+    padding: 8px 16px;
+    font-weight: 600;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 2px solid var(--neon-pink);
+    color: var(--neon-pink);
+    background: transparent;
+    text-decoration: none;
+    box-shadow: 0 0 8px var(--neon-pink);
+    transition: 0.25s ease;
+}
+
+.text-end a.btn-outline-secondary:hover {
+    background: var(--neon-pink);
+    color: #000;
+    box-shadow: 0 0 14px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* ----------------------------------------------------
+   ABOUT US INTERACTIVE CARD
+---------------------------------------------------- */
+.about-card {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 30px 40px;
+    background: rgba(10, 10, 10, 0.9);
+    border: 2px solid var(--neon-pink);
+    border-radius: 16px;
+    box-shadow: 0 0 20px var(--neon-pink), inset 0 0 12px rgba(255, 20, 147, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    cursor: default;
+}
+
+.about-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 0 30px var(--neon-hover), inset 0 0 18px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* Headings */
+.about-card h2 {
+    font-family: "Orbitron", sans-serif;
+    font-size: 28px;
+    text-align: center;
+    color: var(--neon-pink);
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin-bottom: 15px;
+}
+
+.about-card h3 {
+    font-family: "Orbitron", sans-serif;
+    font-size: 22px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    margin-top: 25px;
+    margin-bottom: 10px;
+}
+
+/* Paragraphs */
+.about-card p {
+    font-size: 16px;
+    color: var(--soft-text);
+    line-height: 1.6;
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+/* Features list */
+.about-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.about-card ul li {
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 10px;
+    padding-left: 16px;
+    position: relative;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+/* Custom bullet effect */
+.about-card ul li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    color: var(--neon-pink);
+    text-shadow: 0 0 8px var(--neon-pink);
+}
+
+/* Hover effect on list items */
+.about-card ul li:hover {
+    color: var(--neon-pink);
+    transform: translateX(5px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .about-card {
+        padding: 20px 25px;
+    }
+
+    .about-card h2 {
+        font-size: 24px;
+    }
+
+    .about-card h3 {
+        font-size: 20px;
+    }
+
+    .about-card p,
+    .about-card ul li {
+        font-size: 15px;
+    }
+}
 
 

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}All Itineraries{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4">Itineraries for {{ trip.title }} 🌍</h2>
+
+    {% if trip.itinerary|length == 0 %}
+        <p class="text-muted text-center">No itinerary entries yet.</p>
+    {% else %}
+        <div class="itinerary-mini-card-container">
+            {% for item in trip.itinerary %}
+                <div class="itinerary-mini-card">
+
+                    <div class="mini-info">
+                        <h4 class="mini-title">{{ item.title }}</h4>
+                        <p class="mini-date">{{ item.date }}</p>
+
+                        {% if item.time %}
+                            <p class="mini-text"><b>Time:</b> {{ item.time.strftime("%I:%M %p") }}</p>
+                        {% endif %}
+
+                        {% if item.location %}
+                            <p class="mini-text"><b>Location:</b> {{ item.location }}</p>
+                        {% endif %}
+
+                        {% if item.notes %}
+                            <p class="mini-text"><b>Notes:</b> {{ item.notes }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="mini-buttons">
+                        <a href="{{ url_for('trips.edit_itinerary', item_id=item.id) }}"
+                           class="btn btn-link btn-primary btn-sm">Edit</a>
+
+                        <form method="POST"
+                              action="{{ url_for('trips.delete_itinerary', item_id=item.id) }}"
+                              onsubmit="return confirm('Delete this itinerary item?');">
+                            <button class="btn-trash" style="margin-top: 25px;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 16 16" style="filter: drop-shadow(0 0 8px hotpink); background: transparent;">
+                                <path fill="hotpink" d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0A.5.5 0 0 1 8.5 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5v6a.5.5 1-1 0V6a.5.5 0 0 1 1 0z"/>
+                                <path fill="hotpink" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1 0-2H5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1h2.5a1 1 0 0 1 1 1zM6 1v1h4V1H6z"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn-back">
+            ⬅ Back to Trip
+        </a>
+    </div>
+
+</div>
+{% endblock %}

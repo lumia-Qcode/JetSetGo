@@ -2,14 +2,14 @@
 {% block title %}Budget{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2>💰 Budget for {{ trip.title }}</h2>
-    <p><b>Destination:</b> {{ trip.destination }}</p>
+<div class="manage-budget-container mt-4">
+    <h2>Budget for {{ trip.title }}</h2>
+    <p><b>Destination:</b> {% for d in trip.destinations %}{{ d.name }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
     <p><b>Dates:</b> {{ trip.start_date }} → {{ trip.end_date }}</p>
     <hr>
 
     <!-- Summary -->
-    <div class="card p-3 mb-3">
+    <div class="manage-budget-summary-card p-3 mb-3">
         <p>
             <b>Total Planned:</b> {{ trip.budget.total_planned }} |
             <b>Total Spent:</b> {{ trip.budget.total_spent }} |
@@ -20,9 +20,9 @@
     <!-- Planned Budgets -->
 <h3>Planned Budgets</h3>
 {% if trip.budget.planned_budgets|length == 0 %}
-    <p class="text-muted">No planned budgets yet.</p>
+    <p class="mb-0">No planned budgets yet.</p>
 {% else %}
-    <ul class="list-group mb-3">
+    <ul class="manage-planned-budgets-list list-group mb-3">
       {% for pb in trip.budget.planned_budgets %}
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <div>
@@ -44,7 +44,7 @@
 {% endif %}
 
 <!-- Add Planned Budget -->
-<div class="card p-3 mb-4">
+<div class="manage-budget-add-planned-card p-3 mb-4">
     <h5>Add Planned Budget</h5>
     <form action="{{ url_for('trips.add_planned_budget', trip_id=trip.id) }}" method="POST" id="plannedBudgetForm">
         <div class="row">
@@ -93,7 +93,7 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
 
 
     <!-- Chart -->
-    <div class="card p-3 mb-3">
+    <div class="manage-budget-chart-card p-3 mb-3">
         <h5>Expense Breakdown</h5>
         <!-- Reduced canvas size to make the pie chart smaller. -->
         <!-- Styles and chart options also set maintainAspectRatio=false to respect these dimensions. -->
@@ -110,16 +110,17 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
     {% if trip.budget.expenses|length == 0 %}
         <p class="text-muted">No expenses yet.</p>
     {% else %}
-        <ul class="list-group mb-3">
+        <ul class="manage-expenses-list list-group mb-3">
           {% for expense in trip.budget.expenses %}
             <li class="list-group-item d-flex justify-content-between align-items-center">
               <div>
-                <b>{{ expense.description }}</b> - ${{ expense.amount }}
+                <b>{{ expense.category }}</b> - {{ expense.amount }}
                 {% if expense.shared_users %}
                   <p class="mb-1">
                     Shared with: 
                     {{ expense.shared_users | map(attribute='username') | join(', ') }} ({{ expense.status }})
                   </p>
+
 
                   {% if expense.status == "Pending" and expense.shared_users | map(attribute='username') | join(', ') == session['user_name'] %}
                     <form action="{{ url_for('trips.respond_share', expense_id=expense.id, response='accept') }}" method="post" class="d-inline">
@@ -130,6 +131,8 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
                     </form>
                   {% endif %}
                 {% endif %}
+
+                <p class="mb-0">{{ expense.description }}</p>
               </div>
               <div>
                 <!-- Edit button -->
@@ -151,7 +154,7 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
     {% endif %}
 
     <!-- Add Expense -->
-    <div class="card p-3">
+    <div class="manage-budget-add-expense-card p-3">
         <h5>Add Expense</h5>
         <form action="{{ url_for('trips.trip_budget', trip_id=trip.id) }}" method="POST" class="mb-4">
             <input type="number" name="amount" step="0.01" placeholder="Amount" required class="form-control mb-2">
@@ -211,7 +214,7 @@ if (_dataEl) {
 
 var labels = Object.keys(categoryData);
 var data = Object.values(categoryData);
-//*************************alizeh************************
+
 // Create the pie chart. Chart size is reduced by smaller canvas dimensions
 // and disabling maintainAspectRatio so Chart.js will use the canvas size.
 var ctx = document.getElementById('budgetChart').getContext('2d');
@@ -233,15 +236,41 @@ var budgetChart = new Chart(ctx, {
     },
     options: {
         responsive: true,
-        // Let the chart fill the (smaller) canvas rather than enforcing original aspect ratio
         maintainAspectRatio: false,
+
         plugins: {
-            legend: {
-                display: false,
+            legend: { display: false },
+
+            tooltip: {
+                callbacks: {
+                    enabled: true,
+                    label: function(context) {
+                        const label = context.label;
+                        const value = context.raw;
+
+                        // Correct total calculation for Chart.js v3/v4
+                        const dataset = context.chart.data.datasets[0];
+                        const total = dataset.data.reduce((a, b) => a + b, 0);
+
+                        const percentage = ((value / total) * 100).toFixed(1) + "%";
+
+                        return `${label}: ${percentage}`;
+                    }
+                },
+
+                backgroundColor: 'rgba(255, 20, 147, 0.9)',
+                bodyColor: '#fff',
+                titleColor: '#fff',
+                borderColor: 'rgba(255, 20, 147, 1)',
+                borderWidth: 1,
+                displayColors: false,
+                padding: 10,
+                cornerRadius: 6
             }
         }
-    },
+    }
 });
+
 
 var total = data.reduce((a, b) => a + b, 0);
 var legendHtml = '<div class="d-flex flex-wrap justify-content-center mt-3">';
@@ -262,7 +291,6 @@ var legendContainer = document.createElement('div');
 legendContainer.innerHTML = legendHtml;
 document.getElementById('budgetChart').parentNode.appendChild(legendContainer);
 
-//*************************alizeh************************
 // exportCSV() explanation:
 // - Uses the `expenses` array populated from the server-rendered JSON in
 //   the <script id="expenses-data"> tag. This avoids embedding Jinja inside

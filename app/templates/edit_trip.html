@@ -3,33 +3,33 @@
 
 {% block content %}
 <div class="container mt-4 edit-trip-card">
-    <h2 class="edit-trip-heading">Edit Trip ✏️</h2>
+    <h2 class="edit-trip-heading">Edit Trip</h2>
     <form method="POST" action="{{ url_for('trips.edit_trip', trip_id=trip.id) }}" class="edit-trip-form">
         <div class="form-group mb-3">
-            <label class="edit-label">Title</label>
+            <label class="edit-label"><b>Title</b></label>
             <input type="text" name="title" class="edit-input" value="{{ trip.title }}" required>
         </div>
         <div class="form-group mb-3">
-            <label class="edit-label">Destination</label>
+            <label class="edit-label"><b>Destination</b></label>
             <input type="text" name="destinations" class="edit-input" value="{{ trip.destinations | map(attribute='name') | join(', ') }}" placeholder="Enter destinations (comma-separated)" required>
         </div>
         <div class="row">
             <div class="col-md-6 mb-3">
-                <label class="edit-label">Start Date</label>
+                <label class="edit-label"><b>Start Date</b></label>
                 <input type="date" name="start_date" class="edit-input date-picker" value="{{ trip.start_date }}" required>
             </div>
             <div class="col-md-6 mb-3">
-                <label class="edit-label">End Date</label>
+                <label class="edit-label"><b>End Date</b></label>
                 <input type="date" name="end_date" class="edit-input date-picker" value="{{ trip.end_date }}" required>
             </div>
         </div>
         <div class="form-group mb-3">
-            <label class="edit-label">Description</label>
+            <label class="edit-label"><b>Description</b></label>
             <textarea name="description" class="edit-textarea">{{ trip.description }}</textarea>
         </div>
         <div class="d-flex justify-content-between edit-buttons">
             <button type="submit" class="btn btn-save">Save Changes</button>
-            <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn-link cancel-btn">Cancel</a>
+            <a href="{{ url_for('trips.view_trips', trip_id=trip.id) }}" class="btn-link cancel-btn">Cancel</a>
         </div>
     </form>
 </div>
