@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, url_for, flash, request, session, redirect, Flask
-from app.models import User, PasswordResetToken
+from app.models import User, PasswordResetToken, UserStats
+from app import db
 
 auth_bp = Blueprint('auth', __name__)   # create Blueprint for auth routes
 app = Flask(__name__)   # Create Flask instance (used here only for session secret key — not typically needed in blueprints)
@@ -21,7 +22,8 @@ def login():
         if user:    # If authentication is successful, login user and redirect to home page
             user.login()
             flash(f"Welcome {session['user_name']}, Login Successful!", 'success')
-            return redirect(url_for('view.home'))
+            return redirect(url_for('view.user_home'))
+
         else:       # If authentication fails, flash error message
             flash('Invalid username or password', 'danger')
 
@@ -35,7 +37,7 @@ def login():
 def logout():
     User.logout()
     flash('Logged out', 'info')
-    return redirect(url_for("auth.login"))
+    return render_template("hello.html")
 
 #==========================================================================================================
 
@@ -104,3 +106,33 @@ def reset_password(token):
 
     return render_template("reset_password.html", token=token)
 
+#==========================================================================================================
+@auth_bp.route("/profile")
+def profile():
+    if 'user_id' not in session:
+        flash("Please log in to access your profile.", "danger")
+        return redirect(url_for("auth.login"))
+    
+    user = User.query.get(session['user_id'])
+    user_stats = UserStats.query.filter_by(user_id=user.id).first()
+    return render_template("profile.html", user=user, user_stats=user_stats)
+
+#==========================================================================================================
+@auth_bp.route("/edit-profile", methods=["GET", "POST"])
+def edit_profile():
+    if 'user_id' not in session:
+        flash("Please log in to access your profile.", "danger")
+        return redirect(url_for("auth.login"))
+    
+    user =  User.query.get(session['user_id'])
+
+    if request.method == "POST":
+        user.username = request.form["username"]
+        user.email = request.form["email"]
+        user.theme = request.form["theme"]
+
+        db.session.commit()
+        flash("Profile updated successfully!", "success")
+        return redirect(url_for("auth.profile"))
+
+    return render_template("edit_profile.html", user=user)

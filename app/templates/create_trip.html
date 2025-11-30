@@ -5,16 +5,61 @@
   <div class="card shadow p-4 create-trip-card">
     <h3 class="mb-3 text-center">Create New Trip</h3>
     <form method="POST" action="{{ url_for('trips.create_trip') }}">
-      <input type="text" name="title" placeholder="Trip Title"  class="form-control mb-3">
-      <input type="text" name="destinations" placeholder="Enter destinations (comma-separated)"  class="form-control mb-3">
+      <input type="text" name="title" placeholder="Trip Title" class="form-control mb-3" required>
+      <input type="text" name="destinations" placeholder="Enter destinations (comma-separated)" class="form-control mb-3" required>
       <label><b>Start Date</b></label>
-      <input type="date" name="start_date"  class="form-control mb-3">
+      <input type="date" name="start_date" class="form-control mb-3" required>
       <label><b>End Date</b></label>
-      <input type="date" name="end_date"  class="form-control mb-3">
+      <input type="date" name="end_date" class="form-control mb-3" required>
       <textarea name="description" placeholder="Description" class="form-control mb-3"></textarea>
-      <button type="submit" class="btn create-trip-btn w-100">Create Trip</button>
+      
+      <!-- Buttons Container -->
+      <div class="button-container" style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button type="submit" class="btn create-trip-btn" style="flex: 1; padding: 14px 24px; background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-cyan) 100%); color: white; border: 2px solid var(--neon-pink); border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);">
+          Create Trip
+        </button>
+        <a href="{{ url_for('trips.view_trips') }}" class="btn cancel-btn" style="flex: 1; padding: 14px 24px; background: transparent; color: var(--neon-pink); border: 2px solid var(--neon-pink); border-radius: 8px; font-weight: 600; font-size: 1rem; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+          Cancel
+        </a>
+      </div>
     </form>
-    <a href="{{ url_for('trips.view_trips') }}" class="btn-link cancel-btn mt-3">Cancel</a>
   </div>
 </div>
+
+<style>
+/* Additional styles to ensure buttons are visible */
+.create-trip-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 30px rgba(255, 0, 255, 0.5) !important;
+  background: linear-gradient(135deg, var(--neon-cyan) 0%, var(--neon-pink) 100%) !important;
+}
+
+.cancel-btn:hover {
+  background: var(--neon-pink) !important;
+  color: white !important;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 2px solid rgba(255, 0, 255, 0.3) !important;
+  color: white !important;
+}
+
+.form-control:focus {
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .button-container {
+    flex-direction: column !important;
+  }
+}
+</style>
 {% endblock %}

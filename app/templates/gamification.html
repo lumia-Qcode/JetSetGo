@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+
+{% block title %}Gamification - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="gamification-container">
+    <div class="gamification-header">
+        <h1>Gamification Dashboard</h1>
+        <p>Earn badges and level up by completing tasks!</p>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- User Stats Overview -->
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-content">
+                <h3>Level {{ level }}</h3>
+                <p>{{ user_stats.total_xp }} XP</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <h3>{{ user_stats.tasks_completed }}</h3>
+                <p>Tasks Completed</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-content">
+                <h3>{{ badges|length }}</h3>
+                <p>Badges Earned</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Experience Progress Bar -->
+    <div class="progress-section">
+        <h2>Level Progress</h2>
+        <div class="level-info">
+            <span>Level {{ level }}</span>
+            <span>{{ xp_for_next_level }} XP to next level</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" data-progress="{{ (level_progress | default(0) | int) }}"></div>
+        </div>
+        <p class="progress-text">{{ user_stats.total_xp }} / {{ (level + 1) * 50 }} XP</p>
+    </div>
+
+    <!-- Badges Section -->
+    <div class="badges-section">
+        <h2>🎖️ Badges</h2>
+        
+        {% if badges %}
+            <div class="badges-grid">
+                {% for badge in badges %}
+                    <div class="badge-card earned">
+                        <div class="badge-icon">{{ badge.icon }}</div>
+                        <h3>{{ badge.name }}</h3>
+                        <p>{{ badge.description }}</p>
+                        <span class="earned-date">Earned: {{ badge.earned_at.strftime('%B %d, %Y') }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-badges">
+                <p>No badges earned yet. Complete tasks to earn badges!</p>
+            </div>
+        {% endif %}
+
+        <!-- Badge Thresholds -->
+        <div class="badge-thresholds">
+            <h3>📊 Badge Milestones</h3>
+            <div class="threshold-list">
+                <div class="threshold-item {% if user_stats.tasks_completed >= 5 %}completed{% endif %}">
+                    <span class="threshold-icon">🎯</span>
+                    <div class="threshold-info">
+                        <h4>Task Starter</h4>
+                        <p>Complete 5 tasks</p>
+                    </div>
+                    <span class="progress-indicator">{{ [user_stats.tasks_completed, 5] | min }}/5</span>
+                </div>
+
+                <div class="threshold-item {% if user_stats.tasks_completed >= 10 %}completed{% endif %}">
+                    <span class="threshold-icon">🏅</span>
+                    <div class="threshold-info">
+                        <h4>Task Master</h4>
+                        <p>Complete 10 tasks</p>
+                    </div>
+                    <span class="progress-indicator">{{ [user_stats.tasks_completed, 10] | min }}/10</span>
+                </div>
+
+                <div class="threshold-item {% if user_stats.tasks_completed >= 25 %}completed{% endif %}">
+                    <span class="threshold-icon">👑</span>
+                    <div class="threshold-info">
+                        <h4>Task Legend</h4>
+                        <p>Complete 25 tasks</p>
+                    </div>
+                    <span class="progress-indicator">{{ [user_stats.tasks_completed, 25] | min }}/25</span>
+                </div>
+
+                <div class="threshold-item {% if user_stats.tasks_completed >= 50 %}completed{% endif %}">
+                    <span class="threshold-icon">✈️</span>
+                    <div class="threshold-info">
+                        <h4>Ultimate Traveler</h4>
+                        <p>Complete 50 tasks</p>
+                    </div>
+                    <span class="progress-indicator">{{ [user_stats.tasks_completed, 50] | min }}/50</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('social.leaderboard') }}" class="btn btn-primary" style="width: auto;">
+            <i class="fas fa-ranking-star"></i> View Leaderboard
+        </a>
+        <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-secondary" style="width: auto;">
+            <i class="fas fa-tasks"></i> Complete More Tasks
+        </a>
+    </div>
+</div>
+<style>
+.gamification-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+}
+
+/* Header */
+.gamification-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.gamification-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.gamification-header p {
+    font-size: 18px;
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+
+/* Stats Overview */
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.stat-card {
+    background: #0b0b0b;
+    padding: 30px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+    transition: transform 0.3s;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+}
+.stat-icon {
+    font-size: 48px;
+    color: #ff5be0;
+    text-shadow: 0 0 6px #ff2ecc;
+}
+.stat-content h3 {
+    margin: 0;
+    font-size: 28px;
+}
+.stat-content p {
+    margin: 0;
+    font-size: 14px;
+    color: #ff77ff;
+    text-shadow: 0 0 4px #ff5be0;
+}
+
+/* Progress Section */
+.progress-section {
+    background: #0b0b0b;
+    padding: 30px;
+    border-radius: 14px;
+    margin-bottom: 40px;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+}
+.progress-section h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.level-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #ff77ff;
+}
+.progress-bar {
+    width: 100%;
+    height: 30px;
+    background: #111;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    transition: width 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0 0 4px #ff2ecc;
+}
+.progress-text {
+    text-align: center;
+    color: #ff77ff;
+    font-size: 12px;
+}
+
+/* Badges Section */
+.badges-section {
+    padding: 30px;
+    border-radius: 14px;
+    margin-bottom: 40px;
+    background: #0b0b0b;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+}
+.badges-section h2 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.badges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+.badge-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    background: #111;
+    border: 2px solid #ff1493;
+    color: #fff;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.badge-card.earned {
+    background: #0b0b0b;
+    border: 2px solid #ff5be0;
+    box-shadow: 0 0 12px #ff2ecc, 0 0 24px #ff5be0;
+}
+.badge-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+.badge-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+.badge-card h3 {
+    margin: 10px 0;
+    font-size: 16px;
+}
+.badge-card p {
+    margin: 8px 0;
+    font-size: 12px;
+    color: #ff77ff;
+}
+.earned-date {
+    display: block;
+    font-size: 11px;
+    color: #ff77ff;
+    margin-top: 8px;
+}
+
+/* Badge Thresholds */
+.badge-thresholds {
+    margin-top: 40px;
+    padding-top: 30px;
+}
+.badge-thresholds h3 {
+    margin-bottom: 20px;
+    color: #ff2ecc;
+}
+.threshold-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.threshold-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: #111;
+    border-radius: 10px;
+    border-left: 4px solid #ff1493;
+    transition: all 0.3s;
+}
+.threshold-item.completed {
+    border-left-color: #ff5be0;
+    box-shadow: 0 0 12px #ff2ecc, 0 0 24px #ff5be0 inset;
+}
+.threshold-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+.threshold-info h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #ff2ecc;
+}
+.threshold-info p {
+    margin: 5px 0 0 0;
+    font-size: 12px;
+    color: #ff77ff;
+}
+.progress-indicator {
+    background: #0b0b0b;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #ff5be0;
+}
+.threshold-item.completed .progress-indicator {
+    background: #ff5be0;
+    color: #0b0b0b;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff5be0;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+.btn-secondary {
+    background: #222;
+    color: #ff1493;
+    border: 2px solid #ff1493;
+    box-shadow: 0 0 6px #ff1493;
+}
+.btn-secondary:hover {
+    background: #ff1493;
+    color: #0b0b0b;
+    box-shadow: 0 0 12px #ff5be0;
+}
+
+/* Alerts */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+.alert-success {
+    background: #1c6f3c;
+    color: white;
+}
+.alert-danger {
+    background: #8c1c1c;
+    color: white;
+}
+.alert-warning {
+    background: #1c3e6f;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+    .badges-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.progress-fill').forEach(function(el) {
+            var p = parseInt(el.getAttribute('data-progress')) || 0;
+            el.style.width = p + '%';
+        });
+    });
+</script>
+{% endblock %}

@@ -6,7 +6,7 @@
 
 <div class="form-container">
 
-    <h1>❤️ Add Favorite Destination</h1>
+    <h1>Add Favorite Destination</h1>
     <p style="color:#666; margin-bottom:30px;">Save a destination to your favorites list</p>
 
     <form action="{{ url_for('trips.add_favorite') }}" method="POST">
@@ -39,5 +39,122 @@
     </form>
 
 </div>
+
+<style>
+.form-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #0b0b0b;
+    border-radius: 14px;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+    backdrop-filter: blur(4px);
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+}
+
+/* Header */
+.form-container h1 {
+    font-size: 28px;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+    margin-bottom: 10px;
+}
+.form-container p {
+    color: #ff77ff;
+    text-shadow: 0 0 4px #ff5be0;
+    margin-bottom: 30px;
+}
+
+/* Form Groups */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+.form-label {
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #ff5be0;
+    text-shadow: 0 0 4px #ff1493;
+}
+.form-input, .form-textarea {
+    padding: 12px 15px;
+    border: 2px solid #ff1493;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+    transition: all 0.3s;
+    resize: vertical;
+}
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    border-color: #ff5be0;
+    box-shadow: 0 0 8px #ff5be0, 0 0 12px #ff2ecc;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+.btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 14px;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff5be0;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+.btn-secondary {
+    background: #222;
+    color: #ff1493;
+    border: 1px solid #ff1493;
+    box-shadow: 0 0 6px #ff1493;
+}
+.btn-secondary:hover {
+    background: #ff1493;
+    color: #0b0b0b;
+    box-shadow: 0 0 12px #ff5be0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 20px;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
+
 
 {% endblock %}

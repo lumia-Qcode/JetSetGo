@@ -52,11 +52,58 @@
                     value="{{ task.due_time.strftime('%H:%M') if task.due_time else '' }}">
             </div>
 
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-secondary">⬅ Back</a>
-                <button type="submit" class="btn btn-primary">Save Changes</button>
+            <div class="d-flex justify-content-between edit-buttons">
+                <button type="submit" class="btn btn-save">Save Changes</button>
+                <a href="{{ url_for('tasks.view_tasks') }}" class="btn-link cancel-btn">⬅ Back</a>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+    
+input[type="date"],
+input[type="time"] {
+    position: relative;
+    z-index: 10; /* above alerts or card overlays */
+}
+
+.btn-save {
+  background: var(--neon-pink) !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+
+.cancel-btn:hover {
+  background: var(--neon-pink) !important;
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.form-control {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 2px solid rgba(255, 0, 255, 0.3) !important;
+  color: white !important;
+}
+
+.form-control:focus {
+  border-color: var(--neon-pink) !important;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .button-container {
+    flex-direction: column !important;
+  }
+}
+</style>
+
+
 {% endblock %}

@@ -3,44 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}ORDIVA{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename = 'css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="container">
-            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="JetSetGo Logo" class="logo">
-            <nav>
-                <a href="{{ url_for('view.home') }}">Home</a>
-                <a href="{{ url_for('main.about') }}">About Us</a>
-                {% if 'user_id' in session and 'user_email' in session %}    
-                    <a href="{{ url_for('auth.logout') }}">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}">Login</a>
-                {% endif %}
+<header>
+    <div class="container nav-container">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="JetSetGo Logo" class="logo">
+
+        <nav>
+            {% if 'user_id' in session and 'user_email' in session %}
+
+            <a href="{{ url_for('view.user_home') }}">Home</a>
+
+            {% else %}
+            <a href="{{ url_for('view.landing') }}">Home</a>
+            {% endif %}
+            <a href="{{ url_for('main.about') }}">About Us</a>
+            <a href="{{ url_for('social.explore') }}" class="nav-explore">Explore</a>
+
+            <!-- 🔔 NOTIFICATION BELL -->
+            <div class="notif-wrapper">
+                <i class="fas fa-bell notif-bell" id="notifBell"></i>
+                <span id="notifBadge" class="notif-badge" style="display:none;">0</span>
+
+                <!-- DROPDOWN -->
+                <div class="notif-dropdown" id="notifDropdown">
+                    <p class="notif-title">Notifications</p>
+
+                    <button id="clearAllBtn" class="clear-all-btn">Clear All</button>
+
+                    <ul id="notifList" class="notif-list">
+                        <li class="notif-empty">No notifications</li>
+                    </ul>
+                </div>
+            </div>
+
+            {% if 'user_id' in session and 'user_email' in session %}
+                <!-- USER DROPDOWN MENU -->
+                <div class="user-dropdown-wrapper">
+                    <button class="user-dropdown-toggle">
+                        <i class="fas fa-user-circle"></i>
+                        <span class="username-display">{{ session.get('user_name', 'User') }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown-menu">
+                        <a href="{{ url_for('tasks.view_tasks') }}" class="dropdown-item">
+                            <i class="fas fa-tasks"></i> Tasks
+                        </a>
+                        <a href="{{ url_for('trips.view_trips') }}" class="dropdown-item">
+                            <i class="fas fa-plane"></i> Trips
+                        </a>
+                        <a href="{{ url_for('trips.view_favorites') }}" class="dropdown-item">
+                            <i class="fas fa-heart"></i> Favorites
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="{{ url_for('social.your_page') }}" class="dropdown-item">
+                            <i class="fas fa-user"></i> Your Page
+                        </a>
+                        <a href="{{ url_for('social.gamification') }}" class="dropdown-item">
+                            <i class="fas fa-star"></i> Gamification
+                        </a>
+                        <hr class="dropdown-divider">
+                        <a href="{{ url_for('auth.profile') }}" class="dropdown-item">
+                            <i class="fas fa-cog"></i> Manage Profile 
+                        </a>
+                        <a href="{{ url_for('auth.logout') }}" class="dropdown-item logout-item">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <a href="{{ url_for('auth.login') }}">Login</a>
                 <a href="{{ url_for('auth.register') }}">Register</a>
-            </nav>
-        </div>
-    </header>
+            {% endif %}
+        </nav>
+    </div>
+</header>
 
-    <main class="container">
-        {% with messages = get_flashed_messages(with_categories = True) %}
-            {% for category, message in messages %}
-                 <div class="flash {{category}}">{{ message }}</div>
-            {% endfor %}
-        {% endwith %}
 
-        {% block content %} {% endblock %}
-    </main>
 
-    <footer>
-        <div class="container">
-            <p>&copy; {{ 2025 }} JetSetGo Travel Planner</p>
-        </div>
-    </footer>
+<main class="container">
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
 
-    {% block scripts %}{% endblock %}
+    {% block content %}{% endblock %}
+</main>
 
-    <canvas id="particles"></canvas>
+
+
+<footer>
+    <div class="container">
+        <p>&copy; {{ 2025 }} JetSetGo Travel Planner</p>
+    </div>
+</footer>
+
+
+
+<canvas id="particles"></canvas>
 
 <script>
 const canvas = document.getElementById("particles");
@@ -48,6 +113,11 @@ const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+canvas.style.position = "fixed";
+canvas.style.top = "0";
+canvas.style.left = "0";
+canvas.style.zIndex = "-1";
 
 let particles = [];
 
@@ -90,6 +160,334 @@ window.onresize = () => {
 };
 </script>
 
+<script>
+let slides = document.querySelectorAll(".frame-front .slide");
+let index = 0;
 
+setInterval(() => {
+    slides[index].classList.remove("active");
+    index = (index + 1) % slides.length;
+    slides[index].classList.add("active");
+}, 2500);
+</script>
+
+
+<style>
+    /* EXPLORE LINK STYLING */
+    .nav-explore {
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+
+    .nav-explore:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+    }
+
+    /* USER DROPDOWN STYLING */
+    .user-dropdown-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .user-dropdown-toggle {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        transition: opacity 0.3s;
+        padding: 8px 12px;
+        border-radius: 6px;
+    }
+
+    .user-dropdown-toggle:hover {
+        opacity: 0.8;
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-dropdown-toggle i:first-child {
+        font-size: 20px;
+    }
+
+    .user-dropdown-toggle i:last-child {
+        font-size: 12px;
+        transition: transform 0.3s;
+    }
+
+    .user-dropdown-wrapper:hover .user-dropdown-toggle i:last-child {
+        transform: rotate(180deg);
+    }
+
+ 
+
+/* Dropdown Menu */
+.user-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 110%;
+    background: #0b0b0b;
+    border: 1px solid #ff1493;
+    border-radius: 8px;
+    min-width: 180px;
+    z-index: 100;
+    flex-direction: column;
+}
+
+/* Show Menu on Hover */
+.user-dropdown-wrapper:hover .user-dropdown-menu {
+    display: flex;
+}
+
+/* Dropdown Items */
+.user-dropdown-menu .dropdown-item {
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #ff77ff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.user-dropdown-menu .dropdown-item i {
+    font-size: 14px;
+    color: #ff2ecc;
+}
+
+.user-dropdown-menu .dropdown-item:hover {
+    color: white;
+}
+
+/* Divider */
+.dropdown-divider {
+    height: 1px;
+    margin: 3px 0;
+    background: rgba(255, 20, 147, 0.2);
+}
+
+/* Logout Item Highlight */
+.logout-item {
+    font-weight: 600;
+}
+</style>
+
+</style>
+
+<!-- NOTIFICATION SYSTEM -->
+<script>
+
+// Toggle notification dropdown
+document.getElementById("notifBell").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const dd = document.getElementById("notifDropdown");
+    dd.style.display = dd.style.display === "block" ? "none" : "block";
+    loadNotifications();
+});
+
+// Close dropdown on outside click
+document.addEventListener("click", (e) => {
+    const wrap = document.querySelector(".notif-wrapper");
+    const userDropdown = document.querySelector(".user-dropdown-wrapper");
+    
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById("notifDropdown").style.display = "none";
+    }
+    
+    if (userDropdown && !userDropdown.contains(e.target)) {
+        document.querySelector(".user-dropdown-menu").style.display = "none";
+    }
+});
+
+// Load unread count
+function loadUnreadCount() {
+    fetch("/notifications/unread_count")
+        .then(res => res.json())
+        .then(data => {
+            const badge = document.getElementById("notifBadge");
+            if (data.count > 0) {
+                badge.innerText = data.count;
+                badge.style.display = "block";
+            } else {
+                badge.style.display = "none";
+            }
+        });
+}
+
+// Load notifications list
+function loadNotifications() {
+    fetch("/notifications/list")
+        .then(res => res.json())
+        .then(list => {
+            const ul = document.getElementById("notifList");
+            ul.innerHTML = "";
+
+            if (list.length === 0) {
+                ul.innerHTML = "<li class='notif-empty'>No notifications</li>";
+                return;
+            }
+
+            list.forEach(n => {
+                const li = document.createElement("li");
+                li.className = "notif-item " + (n.is_read ? "" : "unread");
+                li.dataset.id = n.id;
+                li.dataset.tripId = n.trip_id || "";
+                li.dataset.expenseId = n.expense_id || "";
+
+                let actions = "";
+
+                if (n.type === "trip_request") {
+                    actions = `
+                        <div class="notif-actions">
+                            <button class="notif-btn accept" onclick="acceptTrip(${n.id}, ${n.trip_id})">Accept</button>
+                            <button class="notif-btn deny" onclick="denyTrip(${n.id}, ${n.trip_id})">Deny</button>
+                        </div>
+                    `;
+                }
+
+                if (n.type === "expense_share_request" || 
+                    n.type === "expense_request" || 
+                    n.type === "shared_expense" ||
+                    n.type === "expense_invite") {
+                    actions = `
+                        <div class="notif-actions">
+                            <button class="notif-btn accept" onclick="acceptExpense(${n.id}, ${n.expense_id})">Accept</button>
+                            <button class="notif-btn deny" onclick="denyExpense(${n.id}, ${n.expense_id})">Deny</button>
+                        </div>
+                    `;
+                }
+
+                li.innerHTML = `
+                    <div class="notif-avatar">${n.sender ? n.sender[0].toUpperCase() : "?"}</div>
+                    <div class="notif-content">
+                        <strong>${n.sender || "System"}</strong>
+                        <div class="notif-message">${n.message}</div>
+                        <small>${n.created_at}</small>
+                        ${actions}
+                    </div>
+                `;
+
+                ul.appendChild(li);
+            });
+        });
+}
+
+
+// MARK READ (auto called)
+function markRead(id) {
+    fetch(`/notifications/mark_read/${id}`, {
+        method: "POST"
+    });
+}
+
+function acceptTrip(notifId, tripId) {
+    fetch("/notifications/respond_trip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            notif_id: notifId,
+            trip_id: tripId,
+            action: "accept"
+        })
+    })
+    .then(r => r.json())
+    .then(() => {
+        removeNotificationFromUI(notifId);
+    });
+}
+
+function denyTrip(notifId, tripId) {
+    fetch("/notifications/respond_trip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            notif_id: notifId,
+            trip_id: tripId,
+            action: "deny"
+        })
+    })
+    .then(r => r.json())
+    .then(() => {
+        removeNotificationFromUI(notifId);
+    });
+}
+
+
+// EXPENSE ACCEPT
+function acceptExpense(notifId, expenseId) {
+    fetch("/notifications/respond_expense", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            notif_id: notifId,
+            expense_id: expenseId,
+            action: "accept"
+        })
+    })
+    .then(r => r.json())
+    .then(() => {
+        removeNotificationFromUI(notifId);
+    });
+}
+
+// EXPENSE DENY
+function denyExpense(notifId, expenseId) {
+    fetch("/notifications/respond_expense", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            notif_id: notifId,
+            expense_id: expenseId,
+            action: "deny"
+        })
+    })
+    .then(r => r.json())
+    .then(() => {
+        removeNotificationFromUI(notifId);
+    });
+}
+
+
+function removeNotificationFromUI(id) {
+    const el = document.querySelector(`.notif-item[data-id='${id}']`);
+    if (!el) return;
+
+    el.style.transition = "0.4s ease";
+    el.style.opacity = "0";
+    el.style.transform = "translateX(20px)";
+
+    setTimeout(() => {
+        el.remove();
+        loadUnreadCount();
+    }, 350);
+}
+
+document.getElementById("clearAllBtn").addEventListener("click", () => {
+    fetch("/notifications/clear_all", {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(() => {
+        document.getElementById("notifList").innerHTML =
+            "<li class='notif-empty'>No notifications</li>";
+
+        document.getElementById("notifBadge").style.display = "none";
+    });
+});
+
+
+setInterval(loadUnreadCount, 5000);
+loadUnreadCount();
+
+</script>
 </body>
 </html>

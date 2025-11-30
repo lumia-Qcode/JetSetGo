@@ -1,0 +1,364 @@
+{% extends 'base.html' %}
+{% block title %}Reviews{% endblock %}
+
+{% block content %}
+<div class="reviews-container">
+    <div class="reviews-header">
+        <h1>Travel Reviews</h1>
+        <p>Share your travel experiences with the community</p>
+    </div>
+
+    {% if reviews %}
+        <div class="reviews-grid">
+            {% for review in reviews %}
+            <div class="review-card">
+                <div class="review-header">
+                    <div class="review-user-info">
+                        <div class="user-avatar">{{ review.user.username[0].upper() }}</div>
+                        <div>
+                            <h3>{{ review.user.username }}</h3>
+                            <p class="review-trip-title">{{ review.trip.title }}</p>
+                        </div>
+                    </div>
+                    <div class="review-rating">
+                        <span class="stars">{{ review.get_star_display() }}</span>
+                        <span class="rating-number">{{ review.rating }}/5</span>
+                    </div>
+                </div>
+
+                {% if review.photos %}
+                <div class="review-photos">
+                    {% if review.photos|length == 1 %}
+                        <img src="{{ review.photos[0].photo_url }}" alt="Review photo" class="single-photo">
+                    {% elif review.photos|length == 2 %}
+                        <div class="photo-grid-2">
+                            {% for photo in review.photos %}
+                                <img src="{{ photo.photo_url }}" alt="Review photo">
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="photo-grid-multiple">
+                            {% for photo in review.photos[:3] %}
+                                <img src="{{ photo.photo_url }}" alt="Review photo">
+                            {% endfor %}
+                            {% if review.photos|length > 3 %}
+                                <div class="more-photos">+{{ review.photos|length - 3 }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if review.comment %}
+                <div class="review-comment">
+                    <p>{{ review.comment }}</p>
+                </div>
+                {% endif %}
+
+                <div class="review-footer">
+                    <span class="review-date">{{ review.created_at.strftime('%B %d, %Y') }}</span>
+                    {% if review.user_id == session.get('user_id') %}
+                    <div class="review-actions">
+                        <a href="{{ url_for('trips.edit_review', review_id=review.id) }}" class="btn-edit">Edit</a>
+                        <form method="POST" action="{{ url_for('trips.delete_review', review_id=review.id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this review?');">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-reviews">
+            <p>📝 No reviews yet. Be the first to share your travel experience!</p>
+            <a href="{{ url_for('trips.view_trips') }}" class="btn-primary">View Your Trips</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+
+.reviews-container {
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 30px;
+    color: var(--text-color);
+    position: relative;
+    z-index: 10;
+}
+
+.reviews-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.reviews-header h1 {
+    font-family: "Orbitron", sans-serif;
+    color: var(--neon-pink);
+    font-size: 44px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 18px var(--neon-pink);
+}
+
+.reviews-header p {
+    color: var(--soft-text);
+    font-size: 18px;
+}
+
+/* GRID */
+.reviews-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+}
+
+/* REVIEW CARD */
+.review-card {
+    background: rgba(15, 15, 15, 0.85);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 25px;
+    box-shadow: 0 0 18px var(--neon-pink), inset 0 0 10px var(--neon-pink);
+    transition: 0.3s ease;
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.review-card:hover {
+    transform: translateY(-5px) scale(1.015);
+    box-shadow: 0 0 24px var(--neon-hover), inset 0 0 14px var(--neon-hover);
+    border-color: var(--neon-hover);
+}
+
+/* HEADER */
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+/* USER INFO */
+.review-user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--neon-pink);
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 28px;
+    font-weight: 900;
+    text-shadow: 0 0 8px black;
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+.review-user-info h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--neon-pink);
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.review-trip-title {
+    margin-top: 3px;
+    color: var(--soft-text);
+    font-size: 14px;
+}
+
+/* RATING */
+.review-rating {
+    text-align: right;
+}
+
+.stars {
+    font-size: 26px;
+    color: gold;
+    text-shadow: 0 0 10px gold;
+}
+
+.rating-number {
+    display: block;
+    font-size: 14px;
+    color: var(--soft-text);
+}
+
+/* PHOTOS */
+.review-photos {
+    margin: 20px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #ff2ecc55;
+    box-shadow: 0 0 12px #ff2ecc55;
+}
+
+.single-photo {
+    width: 100%;
+    max-height: 450px;
+    object-fit: cover;
+}
+
+.photo-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+}
+
+.photo-grid-2 img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+}
+
+.photo-grid-multiple {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 240px 240px;
+    gap: 6px;
+}
+
+.photo-grid-multiple img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-grid-multiple img:first-child {
+    grid-row: span 2;
+}
+
+/* MORE PHOTOS BADGE */
+.more-photos {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: rgba(255, 20, 147, 0.8);
+    padding: 6px 12px;
+    color: black;
+    border-radius: 14px;
+    font-weight: bold;
+    border: 2px solid black;
+    text-shadow: 0 0 6px black;
+}
+
+/* COMMENT */
+.review-comment {
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 20, 147, 0.06);
+    border-left: 3px solid var(--neon-pink);
+    border-radius: 10px;
+}
+
+.review-comment p {
+    margin: 0;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* FOOTER */
+.review-footer {
+    margin-top: 18px;
+    padding-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid #ff2ecc40;
+}
+
+.review-date {
+    color: var(--soft-text);
+    font-size: 14px;
+}
+
+/* ACTION BUTTONS */
+.review-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-edit,
+.btn-delete {
+    padding: 8px 18px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+    border: none;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+}
+
+.btn-edit {
+    background: var(--neon-pink);
+    color: black;
+    text-shadow: 0 0 6px black;
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.btn-edit:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 18px var(--neon-hover);
+}
+
+.btn-delete {
+    background: #ff0033;
+    color: white;
+    box-shadow: 0 0 12px #ff0033;
+}
+
+.btn-delete:hover {
+    background: #ff3355;
+    box-shadow: 0 0 18px #ff3355;
+}
+
+/* NO REVIEWS */
+.no-reviews {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.no-reviews p {
+    font-size: 20px;
+    color: var(--soft-text);
+}
+
+.btn-primary {
+    margin-top: 15px;
+    padding: 12px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    background: var(--neon-pink);
+    color: black;
+    font-weight: 700;
+    transition: 0.25s;
+    box-shadow: 0 0 16px var(--neon-pink);
+}
+
+.btn-primary:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 22px var(--neon-hover);
+    transform: translateY(-3px);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .review-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: left;
+    }
+
+    .review-rating {
+        text-align: left;
+    }
+}
+</style>
+{% endblock %}

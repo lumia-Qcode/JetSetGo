@@ -1,0 +1,272 @@
+{% extends 'base.html' %}
+
+{% block title %}Search: {{ query }} - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <div class="search-header">
+        <h1>Search Results</h1>
+        <p>Results for "<strong>{{ query }}</strong>"</p>
+    </div>
+
+    <div class="back-button">
+        <a href="{{ url_for('social.explore') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Explore
+        </a>
+    </div>
+
+    {% if posts %}
+        <div class="results-info">
+            <p>Found <strong>{{ posts|length }}</strong> post{{ 's' if posts|length != 1 else '' }}</p>
+        </div>
+
+        <div class="search-posts">
+            {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div>
+                                <h3>{{ post.user.username }}</h3>
+                                <span class="post-date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if post.image_url %}
+                        <div class="post-image">
+                            <img src="{{ post.image_url }}" alt="Post image">
+                        </div>
+                    {% endif %}
+
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                    </div>
+
+                    <div class="post-stats">
+                        <span><i class="fas fa-heart"></i> {{ post.get_like_count() }} likes</span>
+                        <span><i class="fas fa-comment"></i> {{ post.comments|length }} comments</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h3>No results found</h3>
+            <p>We couldn't find any posts matching "<strong>{{ query }}</strong>"</p>
+            <p>Try searching with different keywords or explore popular hashtags</p>
+            <a href="{{ url_for('social.explore') }}" class="btn btn-primary">Back to Explore</a>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    .search-container {
+        max-width: 800px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    .search-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #eee;
+    }
+
+    .search-header h1 {
+        font-size: 36px;
+        margin-bottom: 5px;
+    }
+
+    .search-header p {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .search-header strong {
+        color: #667eea;
+    }
+
+    .back-button {
+        margin-bottom: 30px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+    }
+
+    .btn-back:hover {
+        color: #764ba2;
+    }
+
+    .results-info {
+        margin-bottom: 20px;
+        padding: 12px 16px;
+        background: #f0f8ff;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .results-info strong {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .search-posts {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .post-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: box-shadow 0.3s;
+    }
+
+    .post-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .post-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .post-user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .post-user-info i {
+        font-size: 40px;
+        color: #667eea;
+    }
+
+    .post-user-info h3 {
+        margin: 0;
+        font-size: 16px;
+    }
+
+    .post-date {
+        font-size: 12px;
+        color: #999;
+    }
+
+    .post-image {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        overflow: hidden;
+        background: #f0f0f0;
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .post-content {
+        padding: 20px;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #333;
+    }
+
+    .post-content p {
+        margin: 0;
+        word-wrap: break-word;
+    }
+
+    .post-stats {
+        display: flex;
+        gap: 20px;
+        padding: 12px 20px;
+        border-top: 1px solid #eee;
+        font-size: 14px;
+        color: #666;
+    }
+
+    .post-stats span {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .no-results i {
+        font-size: 64px;
+        margin-bottom: 20px;
+        color: #ddd;
+    }
+
+    .no-results h3 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+
+    .no-results p {
+        margin-bottom: 10px;
+    }
+
+    .no-results strong {
+        color: #667eea;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    @media (max-width: 768px) {
+        .search-header h1 {
+            font-size: 28px;
+        }
+
+        .post-image {
+            max-width: 100%;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ hashtag }} - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="hashtag-container">
+    <div class="hashtag-header">
+        <h1>{{ hashtag }}</h1>
+        <p>{{ posts|length }} posts</p>
+    </div>
+
+    {% if posts %}
+        <div class="hashtag-posts">
+            {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div>
+                                <h3>{{ post.user.username }}</h3>
+                                <span class="post-date">{{ post.created_at.strftime('%B %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if post.image_url %}
+                        <div class="post-image">
+                            <img src="{{ post.image_url }}" alt="Post image">
+                        </div>
+                    {% endif %}
+
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                    </div>
+
+                    <div class="post-stats">
+                        <span><i class="fas fa-heart"></i> {{ post.get_like_count() }} likes</span>
+                        <span><i class="fas fa-comment"></i> {{ post.comments|length }} comments</span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h3>No posts found</h3>
+            <p>There are no posts with this hashtag yet. Be the first to post with {{ hashtag }}!</p>
+            <a href="{{ url_for('social.create_post') }}" class="btn btn-primary">Create a Post</a>
+        </div>
+    {% endif %}
+
+    <div class="back-button">
+        <a href="{{ url_for('social.explore') }}" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Explore
+        </a>
+    </div>
+
+</div>
+<style>
+.hashtag-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    background: #0b0b0b;
+}
+
+/* Header */
+.hashtag-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ff1493;
+}
+.hashtag-header h1 {
+    font-size: 36px;
+    margin-bottom: 5px;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.hashtag-header p {
+    font-size: 14px;
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+
+/* Back Button */
+.back-button {
+    margin-bottom: 30px;
+    margin-top: 30px;
+}
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.btn-back:hover {
+    color: black;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+
+/* Hashtag Posts */
+.hashtag-posts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.post-card {
+    background: #0b0b0b;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255,20,147,0.3);
+    overflow: hidden;
+    transition: 0.3s;
+}
+.post-card:hover {
+    box-shadow: 0 0 15px #ff1493, 0 0 30px #ff2ecc, 0 0 45px #ff5be0;
+}
+.post-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #ff1493;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.post-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.post-user-info i {
+    font-size: 40px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.post-user-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #ff77ff;
+}
+.post-date {
+    font-size: 12px;
+    color: #ff77ff;
+}
+
+/* Post Image */
+.post-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #0b0b0b;
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 1px solid #ff1493;
+}
+.post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Post Content */
+.post-content {
+    padding: 20px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #fff;
+}
+.post-content p {
+    margin: 0;
+    word-wrap: break-word;
+}
+
+/* Post Stats */
+.post-stats {
+    display: flex;
+    gap: 20px;
+    padding: 12px 20px;
+    border-top: 1px solid #ff1493;
+    font-size: 14px;
+    color: #ff77ff;
+}
+.post-stats span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ff77ff;
+}
+.no-results i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #ff1493;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.no-results h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ff2ecc;
+}
+.no-results p {
+    margin-bottom: 20px;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff5be0;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hashtag-header h1 { font-size: 28px; }
+    .post-image { max-width: 100%; }
+}
+</style>
+
+{% endblock %}

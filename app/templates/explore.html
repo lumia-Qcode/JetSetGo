@@ -1,0 +1,308 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="explore-container">
+    <div class="explore-header">
+        <h1>Explore</h1>
+        <p>Discover posts and places from around the world</p>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="search-section">
+        <form method="GET" action="{{ url_for('social.search_posts') }}" class="search-form">
+            <input type="text" name="q" placeholder="Search places, hashtags, keywords..." required>
+            <button type="submit" class="btn-search">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Trending Hashtags -->
+    <div class="trending-section">
+        <h2>Trending Hashtags</h2>
+        <div class="hashtags-grid">
+            {% for item in hashtags %}
+                <a href="{{ url_for('social.search_hashtag', tag=item.tag.lstrip('#')) }}" class="hashtag-card">
+                    <div class="hashtag-name">{{ item.tag }}</div>
+                    <div class="hashtag-count">{{ item.count }} posts</div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Recent Posts -->
+    <div class="recent-posts-section">
+        <h2>Recent Posts</h2>
+        <div class="posts-grid">
+            {% if recent_posts %}
+                {% for post in recent_posts %}
+                    <div class="post-preview-card">
+                        {% if post.image_url %}
+                            <div class="preview-image">
+                                <img src="{{ post.image_url }}" alt="Post">
+                            </div>
+                        {% else %}
+                            <div class="preview-image-placeholder">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        {% endif %}
+                        <div class="preview-content">
+                            <h3>{{ post.user.username }}</h3>
+                            <p>{{ post.content[:100] }}{% if post.content|length > 100 %}...{% endif %}</p>
+                            <div class="preview-stats">
+                                <span><i class="fas fa-heart"></i> {{ post.get_like_count() }}</span>
+                                <span><i class="fas fa-comment"></i> {{ post.comments|length }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('social.your_page') }}" class="preview-overlay"></a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-posts">No posts yet</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<style>
+.explore-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    background: #0b0b0b;
+}
+
+/* Header */
+.explore-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.explore-header h1 {
+    font-size: 36px;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+    margin-bottom: 10px;
+}
+.explore-header p {
+    font-size: 16px;
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+
+/* Search Section */
+.search-section {
+    margin-bottom: 40px;
+    text-align: center;
+}
+.search-form {
+    display: flex;
+    gap: 10px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+.search-form input {
+    flex: 1;
+    padding: 12px 20px;
+    border: 2px solid #ff1493;
+    border-radius: 25px;
+    background: #0b0b0b;
+    color: #fff;
+    font-size: 14px;
+    transition: 0.3s;
+}
+.search-form input:focus {
+    outline: none;
+    border-color: #ff5be0;
+    box-shadow: 0 0 8px #ff5be0, 0 0 12px #ff2ecc;
+}
+.btn-search {
+    background: linear-gradient(120deg, #ff1493, #ff2ecc, #ff5be0);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.btn-search:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px #ff1493, 0 0 24px #ff2ecc, 0 0 36px #ff5be0;
+}
+
+/* Trending Hashtags */
+.trending-section {
+    margin-bottom: 50px;
+}
+.trending-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.hashtags-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+.hashtag-card {
+    background: linear-gradient(120deg, #ff1493, #ff2ecc, #ff5be0);
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(255,20,147,0.4);
+
+    /* Fix long hashtags */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    white-space: normal;
+}
+
+.hashtag-name {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 8px;
+
+    /* Ensure wrapping for long hashtags */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+}
+
+.hashtag-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(255,20,147,0.6);
+}
+
+.hashtag-count {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+/* Recent Posts */
+.recent-posts-section {
+    margin-bottom: 40px;
+}
+.recent-posts-section h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+.post-preview-card {
+    background: #0b0b0b;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(255,20,147,0.3);
+    transition: all 0.3s;
+    position: relative;
+}
+.post-preview-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 15px #ff1493, 0 0 30px #ff2ecc, 0 0 45px #ff5be0;
+}
+.preview-image, .preview-image-placeholder {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    border-bottom: 1px solid #ff1493;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0b0b0b;
+}
+.preview-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.preview-image-placeholder i {
+    font-size: 48px;
+    color: #ff1493;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.preview-content {
+    padding: 15px;
+}
+.preview-content h3 {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+    color: #ff2ecc;
+    font-weight: 600;
+}
+.preview-content p {
+    font-size: 12px;
+    color: #fff;
+    margin: 0 0 10px 0;
+    line-height: 1.4;
+}
+.preview-stats {
+    display: flex;
+    gap: 15px;
+    font-size: 12px;
+    color: #fff;
+}
+.preview-stats span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.preview-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255,20,147,0);
+    transition: background 0.3s;
+    cursor: pointer;
+}
+.post-preview-card:hover .preview-overlay {
+    background: rgba(255,20,147,0.1);
+}
+.no-posts {
+    text-align: center;
+    color: #ff2ecc;
+    padding: 40px;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hashtags-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .posts-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+    .search-form {
+        flex-direction: column;
+    }
+    .btn-search {
+        width: 100%;
+    }
+}
+</style>
+
+
+
+{% endblock %}

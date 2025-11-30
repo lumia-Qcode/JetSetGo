@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}User Profile{% endblock %}
+
+{% block content %}
+
+<div class="profile-wrapper">
+
+    <div class="profile-card">
+
+        <h2 class="profile-title">{{ user.username }}'s Profile</h2>
+
+        <div class="profile-details">
+
+            <div class="detail-row">
+                <span class="label">Username:</span>
+                <span class="value">{{ user.username }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Email:</span>
+                <span class="value">{{ user.email }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Tasks Completed:</span>
+                <span class="value">{{ user_stats.tasks_completed }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">XP Points:</span>
+                <span class="value">{{ user_stats.total_xp }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Theme:</span>
+                <span class="value">{{ user_stats.theme }}</span>
+            </div>
+
+            <div class="detail-row">
+                <span class="label">Member Since:</span>
+                <span class="value">{{ user_stats.created_at.strftime("%b %d, %Y — %I:%M %p") }}</span>
+            </div>
+
+        </div>
+
+        <div class="profile-buttons">
+            <a href="{{ url_for('auth.edit_profile') }}" class="btn neon-btn">Edit Profile</a>
+            <a href="{{ url_for('view.user_home') }}" class="btn neon-outline">Home</a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

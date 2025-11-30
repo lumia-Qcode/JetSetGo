@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block title %}Welcome - JetSetGo{% endblock %}
+
+{% block content %}
+
+<div class="landing-container">
+
+    <div class="insta-left">
+
+    <!-- Floating Emojis (always on top) -->
+    <div class="emoji e1">🔥</div>
+    <div class="emoji e2">💬</div>
+    <div class="emoji e3">❤</div>
+    <div class="emoji e4">⭐</div>
+    <div class="emoji e5">👍</div>
+
+    <!-- Overlapping Cards -->
+    <div class="card-stack">
+
+        <!-- Back Card -->
+        <div class="frame frame-back">
+            <img src="{{ url_for('static', filename='images/T1.jpg') }}" />
+        </div>
+
+        <!-- Middle Card -->
+        <div class="frame frame-mid">
+            <img src="{{ url_for('static', filename='images/T2.jpg') }}" />
+        </div>
+
+        <!-- Front Card (Slideshow) -->
+        <div class="frame frame-front">
+            <img src="{{ url_for('static', filename='images/ARO.jpg') }}" class="slide active">
+            <img src="{{ url_for('static', filename='images/T1.jpg') }}" class="slide">
+            <img src="{{ url_for('static', filename='images/T2.jpg') }}" class="slide">
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    <!-- RIGHT SIDE (Login Box) -->
+    <div class="landing-right">
+        <h1 class="brand-title">JetSetGo</h1>
+
+        <a href="{{ url_for('auth.login') }}" class="btn-login">Log in</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-register">Create Account</a>
+    </div>
+<!--
+<div class="airplane-wrapper">
+<svg id="flightSVG" width="500" height="500" viewBox="0 0 500 500">
+    
+   
+    <path id="flightPath"
+          d="M 100 350 
+             C 150 100, 350 100, 400 350"
+          stroke="rgba(255,255,255,0.2)"
+          stroke-width="3"
+          fill="none"
+    />
+
+    
+    <image id="planeSVG"
+           href="{{ url_for('static', filename='images/airplane-svgrepo-com.svg') }}"
+           width="40" height="40">
+        <animateMotion
+            dur="6s"
+            repeatCount="indefinite"
+            rotate="auto"
+            path="M 100 350 
+                  C 150 100, 350 100, 400 350"
+        />
+    </image>
+
+</svg>
+</div>
+
+<div class="airplane-layer">
+<svg id="flightSVG" width="1200" height="900" viewBox="0 0 1200 900">
+
+   
+    <path id="flightPath"
+          d="M 100 500
+             C 250 200, 450 200, 600 500
+             C 750 800, 950 800, 1100 500
+             C 950 300, 750 300, 600 500
+             C 450 700, 250 700, 100 500 Z"
+          stroke="rgba(255,255,255,0.25)"
+          stroke-width="3"
+          fill="none"
+    />
+
+   
+    <image id="planeSVG"
+           href="{{ url_for('static', filename='images/airplane-svgrepo-com.svg') }}"
+           width="55" height="55">
+
+        
+        <animateMotion id="planeMotion"
+            dur="9s"
+            repeatCount="indefinite"
+            rotate="auto"
+            path="M 100 500
+                 C 250 200, 450 200, 600 500
+                 C 750 800, 950 800, 1100 500
+                 C 950 300, 750 300, 600 500
+                 C 450 700, 250 700, 100 500 Z"
+        />
+
+    </image>
+
+</svg>
+</div>
+
+
+</div>
+
+<script>
+
+const plane = document.getElementById("planeSVG");
+const motion = document.getElementById("planeMotion");
+
+
+const BACK = 1;
+const FRONT = 50;
+
+
+motion.addEventListener("beginEvent", () => animateZ());
+
+function animateZ() {
+    let t = 0;
+    function loop() {
+        t = (t + 0.005) % 1; 
+        const percent = t * 100;
+
+        
+        if (percent < 25) {
+            document.querySelector(".airplane-layer").style.zIndex = BACK;
+        }
+
+        
+        else if (percent < 55) {
+            document.querySelector(".airplane-layer").style.zIndex = FRONT;
+        }
+
+        
+        else {
+            document.querySelector(".airplane-layer").style.zIndex = BACK;
+        }
+
+        requestAnimationFrame(loop);
+    }
+    loop();
+}
+</script>
+
+-->
+
+
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}Add Review{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 700px;">
+    <div class="card shadow p-4">
+        <h2 class="text-center mb-4" style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">
+            ✍️ Write a Review
+        </h2>
+        <p class="text-center mb-4" style="color: #ccc;">
+            Share your experience for <strong style="color: var(--neon-cyan);">{{ trip.title }}</strong>
+        </p>
+
+        <form method="POST" action="{{ url_for('trips.add_review', trip_id=trip.id) }}" enctype="multipart/form-data">
+            
+            <!-- Rating Section -->
+            <div class="mb-4">
+                <label style="color: #fff; font-weight: bold; margin-bottom: 10px; display: block;">Rating *</label>
+                <div class="star-rating" style="text-align: center;">
+                    <input type="radio" name="rating" value="5" id="star5" required>
+                    <label for="star5" title="5 stars">★</label>
+                    
+                    <input type="radio" name="rating" value="4" id="star4">
+                    <label for="star4" title="4 stars">★</label>
+                    
+                    <input type="radio" name="rating" value="3" id="star3">
+                    <label for="star3" title="3 stars">★</label>
+                    
+                    <input type="radio" name="rating" value="2" id="star2">
+                    <label for="star2" title="2 stars">★</label>
+                    
+                    <input type="radio" name="rating" value="1" id="star1">
+                    <label for="star1" title="1 star">★</label>
+                </div>
+            </div>
+
+            <!-- Comment Section -->
+            <div class="mb-4">
+                <label for="comment" style="color: #fff; font-weight: bold; margin-bottom: 10px; display: block;">Your Review</label>
+                <textarea 
+                    name="comment" 
+                    id="comment" 
+                    rows="6" 
+                    class="form-control"
+                    placeholder="Tell us about your experience... What did you love? What could be better?"
+                    style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 0, 255, 0.3); color: white !important; padding: 15px; border-radius: 8px; width: 100%; resize: vertical; font-family: inherit; font-size: 1rem; line-height: 1.5; position: relative; z-index: 1;"
+                ></textarea>
+            </div>
+
+            <!-- Photo Upload Section -->
+            <div class="mb-4">
+                <label for="photos" style="color: #fff; font-weight: bold; margin-bottom: 10px; display: block;">Add Photos (Optional)</label>
+                <input 
+                    type="file" 
+                    name="photos" 
+                    id="photos" 
+                    accept="image/*" 
+                    multiple 
+                    class="form-control"
+                    style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 0, 255, 0.3); color: white; padding: 10px; border-radius: 8px;"
+                >
+                <small style="color: #999; margin-top: 5px; display: block;">You can select multiple photos</small>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="submit" class="btn" style="flex: 1; padding: 12px 24px; background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-cyan) 100%); color: white; border: 2px solid var(--neon-pink); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s;">
+                    Post Review
+                </button>
+                <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn" style="flex: 1; padding: 12px 24px; background: transparent; color: var(--neon-pink); border: 2px solid var(--neon-pink); border-radius: 8px; font-weight: 600; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+/* Star Rating Styles */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 3rem;
+}
+
+.star-rating input {
+    display: none;
+}
+
+.star-rating label {
+    cursor: pointer;
+    color: #444;
+    transition: color 0.2s;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #f39c12;
+    text-shadow: 0 0 10px #f39c12;
+}
+
+textarea:focus, input[type="file"]:focus {
+    outline: none !important;
+    border-color: var(--neon-pink) !important;
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.3) !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+textarea {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    user-select: text !important;
+    pointer-events: auto !important;
+}
+
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--neon-pink);
+}
+
+a.btn:hover {
+    background: var(--neon-pink) !important;
+    color: white !important;
+}
+</style>
+{% endblock %}

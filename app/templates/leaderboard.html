@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="leaderboard-container">
+    <div class="leaderboard-header">
+        <h1>Global Leaderboard</h1>
+        <p>Top users by XP</p>
+    </div>
+
+    <div class="leaderboard-table-wrapper">
+        {% if top_users %}
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th class="rank-col">Rank</th>
+                        <th class="user-col">User</th>
+                        <th class="xp-col">XP</th>
+                        <th class="level-col">Level</th>
+                        <th class="tasks-col">Tasks</th>
+                        <th class="badges-col">Badges</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_stat in top_users %}
+                        {% set rank = loop.index %}
+                        <tr class="leaderboard-row {% if user_stat.user_id == session.get('user_id') %}current-user{% endif %}">
+                            <td class="rank-col">
+                                {% if rank == 1 %}
+                                    <span class="medal">🥇</span>
+                                {% elif rank == 2 %}
+                                    <span class="medal">🥈</span>
+                                {% elif rank == 3 %}
+                                    <span class="medal">🥉</span>
+                                {% else %}
+                                    <span class="rank-number">#{{ rank }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="user-col">
+                                <div class="user-info">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span class="username">{{ user_stat.user.username }}</span>
+                                </div>
+                            </td>
+                            <td class="xp-col">
+                                <span class="xp-badge">{{ user_stat.total_xp }}</span>
+                            </td>
+                            <td class="level-col">
+                                <span class="level-badge">{{ user_stat.get_level() }}</span>
+                            </td>
+                            <td class="tasks-col">{{ user_stat.tasks_completed }}</td>
+                            <td class="badges-col">
+                                <span class="badge-count">{{ user_stat.badges|length }}</span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="no-users">
+                <i class="fas fa-inbox"></i>
+                <h3>No users yet</h3>
+                <p>Start completing tasks to appear on the leaderboard!</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ url_for('social.gamification') }}" class="btn btn-primary" style="width: auto;">
+            <i class="fas fa-star"></i> My Gamification
+        </a>
+        <a href="{{ url_for('tasks.view_tasks') }}" class="btn btn-secondary" style="width: auto;">
+            <i class="fas fa-tasks"></i> Complete Tasks
+        </a>
+    </div>
+</div>
+
+<style>
+.leaderboard-container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+}
+
+/* Header */
+.leaderboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.leaderboard-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.leaderboard-header p {
+    font-size: 16px;
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+
+/* Table Wrapper */
+.leaderboard-table-wrapper {
+    background: #0b0b0b;
+    border-radius: 14px;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+    overflow: hidden;
+}
+
+/* Table */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0b0b0b;
+    color: #fff;
+}
+.leaderboard-table thead {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+}
+.leaderboard-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Columns */
+.rank-col { width: 80px; }
+.user-col { width: 200px; }
+.xp-col, .level-col, .tasks-col, .badges-col { width: 80px; }
+
+/* Table Rows */
+.leaderboard-table tbody tr {
+    border-bottom: 1px solid rgba(255,20,147,0.2);
+    transition: all 0.3s;
+}
+.leaderboard-table tbody tr:hover {
+    background: rgba(255,20,147,0.1);
+}
+.leaderboard-table tbody tr.current-user {
+    background: rgba(255,20,147,0.2);
+    border-left: 4px solid #ff2ecc;
+}
+
+/* Table Cells */
+.leaderboard-table td {
+    padding: 16px;
+    font-size: 14px;
+    color: #fff;
+}
+
+/* Ranks & Medals */
+.rank-number { font-weight: bold; color: #ff5be0; }
+.medal { font-size: 20px; }
+
+/* User Info */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.user-info i {
+    font-size: 24px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff5be0;
+}
+.username { font-weight: 500; }
+
+/* Badges & XP */
+.xp-badge {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+.level-badge {
+    background: #ff5be0;
+    color: #0b0b0b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+.badge-count {
+    background: #ff1493;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+}
+
+/* No Users State */
+.no-users {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ff77ff;
+}
+.no-users i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #ff5be0;
+}
+.no-users h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.btn {
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: none;
+    cursor: pointer;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff5be0;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+.btn-secondary {
+    background: #222;
+    color: #ff1493;
+    border: 2px solid #ff1493;
+    box-shadow: 0 0 6px #ff1493;
+}
+.btn-secondary:hover {
+    background: #ff1493;
+    color: #0b0b0b;
+    box-shadow: 0 0 12px #ff5be0;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+    .leaderboard-table { font-size: 12px; }
+    .leaderboard-table th, .leaderboard-table td { padding: 10px; }
+    .rank-col, .xp-col, .level-col, .tasks-col, .badges-col { width: auto; }
+    .user-col { width: 150px; }
+    .action-buttons { flex-direction: column; }
+    .btn { width: 100%; justify-content: center; }
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+
+<div class="profile-wrapper">
+
+    <div class="profile-card">
+
+        <h2 class="profile-title">Edit Profile</h2>
+
+        <!-- Edit Profile Form -->
+        <form action="{{ url_for('auth.edit_profile') }}" method="POST" enctype="multipart/form-data">
+
+            <div class="edit-fields">
+
+                <!-- Username -->
+                <div class="edit-row">
+                    <label class="edit-label">Username</label>
+                    <input type="text" name="username" class="edit-input" value="{{ user.username }}" required>
+                </div>
+
+                <!-- Email -->
+                <div class="edit-row">
+                    <label class="edit-label">Email</label>
+                    <input type="email" name="email" class="edit-input" value="{{ user.email }}" required>
+                </div>
+
+                <!-- Theme -->
+                <div class="edit-row">
+                    <label class="edit-label">Theme</label>
+                    <select name="theme" class="edit-input">
+                        <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Dark Cyber</option>
+                        <option value="light" {% if user.theme == 'light' %}selected{% endif %}>Light Mode</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="profile-buttons">
+                <button type="submit" class="btn neon-btn">Save Changes</button>
+                <a href="{{ url_for('auth.profile') }}" class="btn neon-outline">Cancel</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<style>
+   
+
+.edit-fields {
+    margin-top: 20px;
+}
+
+.edit-row {
+    margin-bottom: 22px;
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-label {
+    color: var(--neon-pink);
+    font-weight: 600;
+    margin-bottom: 6px;
+    text-shadow: 0 0 6px var(--neon-pink);
+}
+
+.edit-input {
+    padding: 12px 14px;
+    background: #0a0a0a;
+    border: 1px solid rgba(255, 20, 147, 0.3);
+    border-radius: 8px;
+    color: var(--text-color);
+    transition: 0.25s ease;
+}
+
+.edit-input:focus {
+    border-color: var(--neon-pink);
+    box-shadow: 0 0 12px var(--neon-pink);
+}
+
+.edit-input-file {
+    padding: 10px;
+    background: #111;
+    border: 1px solid rgba(255, 20, 147, 0.3);
+    border-radius: 8px;
+    color: var(--soft-text);
+}
+
+</style>
+
+{% endblock %}

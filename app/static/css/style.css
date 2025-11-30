@@ -184,10 +184,13 @@ nav a:hover {
     background-size: 400% 400%;
     animation: gradientMove 6s infinite linear;
 
+    mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
     -webkit-mask: linear-gradient(#000 0 0) content-box,
-                  linear-gradient(#000 0 0);
+                linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
-            mask-composite: exclude;
+    mask-composite: exclude;
+
 }
 
 @keyframes gradientMove {
@@ -502,7 +505,10 @@ input:-moz-autofill {
     background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
     background-size: 400% 400%;
     animation: gradientMove 6s infinite linear;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 1;
@@ -794,7 +800,10 @@ input:-moz-autofill {
     background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
     background-size: 400% 400%;
     animation: gradientMove 6s infinite linear;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 1;
@@ -1013,7 +1022,10 @@ input:-moz-autofill {
     background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
     background-size: 400% 400%;
     animation: gradientMove 6s infinite linear;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 1;
@@ -1239,7 +1251,10 @@ input:-moz-autofill {
     background: linear-gradient(120deg, #ff2ecc, #ff5be0, #ff2ecc);
     background-size: 400% 400%;
     animation: gradientMove 6s linear infinite;
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+                linear-gradient(#000 0 0);
     -webkit-mask-composite: xor;
     mask-composite: exclude;
     z-index: 2;
@@ -2432,5 +2447,711 @@ canvas,
         font-size: 15px;
     }
 }
+
+/* ------------------------------
+   🔔  Notification Wrapper
+   ------------------------------ */
+.notif-wrapper {
+    position: relative;
+    display: inline-block;
+    margin-left: 18px;
+}
+
+/* Bell icon */
+.notif-bell {
+    font-size: 22px;
+    color: var(--soft-text);
+    cursor: pointer;
+    transition: 0.25s ease;
+    text-shadow: none;
+    position: relative;
+    top: 2px;
+}
+
+.notif-bell:hover {
+    color: var(--neon-pink);
+    text-shadow: 0 0 12px var(--neon-pink);
+    transform: translateY(-2px) scale(1.1) rotate(-3deg);
+}
+
+/* ------------------------------
+   🔽 Dropdown
+   ------------------------------ */
+.notif-dropdown {
+    position: absolute;
+    top: 35px;
+    right: -10px;
+    width: 450px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: var(--card-bg, #1a1a1a);
+    border: 1px solid var(--neon-pink);
+    padding: 12px;
+    display: none;
+    border-radius: 12px;
+    box-shadow: 0 0 20px var(--neon-pink);
+    z-index: 1000;
+}
+
+/* Pink arrow */
+.notif-dropdown::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    right: 20px;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: transparent transparent var(--neon-pink) transparent;
+}
+
+/* ------------------------------
+   Title
+   ------------------------------ */
+.notif-title {
+    color: var(--neon-pink);
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* ------------------------------
+   Scrollable list
+   ------------------------------ */
+.notif-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ------------------------------
+   Single Notification Item
+   ------------------------------ */
+.notif-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    background: rgba(255, 46, 204, 0.05);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+/* Hover effect */
+.notif-item:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 46, 204, 0.12);
+}
+
+/* ------------------------------
+   🔥 UNREAD = glow
+   ------------------------------ */
+.notif-item.unread {
+    background: rgba(255, 46, 204, 0.15);
+    border-left: 3px solid var(--neon-pink);
+    animation: glowPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 6px var(--neon-pink); }
+    100% { box-shadow: 0 0 14px var(--neon-pink); }
+}
+
+/* ------------------------------
+   👤 Avatar 
+   ------------------------------ */
+.notif-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: bold;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* If system notification → hide avatar */
+.notif-item.system .notif-avatar {
+    display: none;
+}
+
+/* ------------------------------
+   Text Content
+   ------------------------------ */
+.notif-content {
+    flex: 1;
+}
+
+.notif-content strong {
+    color: var(--soft-text);
+    font-size: 14px;
+}
+
+.notif-content small {
+    display: block;
+    color: var(--muted);
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+/* ------------------------------
+   Action Buttons
+   ------------------------------ */
+.notif-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+}
+
+.notif-btn {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    font-weight: bold;
+}
+
+/* Accept */
+.notif-btn.accept {
+    background: #0aff9d;
+    color: #000;
+    box-shadow: 0 0 8px #0aff9d;
+}
+
+/* Deny */
+.notif-btn.deny {
+    background: #ff2ecc;
+    color: white;
+    box-shadow: 0 0 8px #ff2ecc;
+}
+
+/* Badge */
+.notif-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--neon-pink);
+    color: white;
+    font-size: 10px;
+    padding: 3px 6px;
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 0 0 5px var(--neon-pink);
+}
+
+/* Force small action buttons to auto-size inside lists */
+.manage-expenses-list .list-group-item div:last-child a,
+.manage-expenses-list .list-group-item div:last-child button,
+.notif-actions .notif-btn {
+    width: auto !important;   /* undo global full-width */
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.notif-btn {
+    transform: translateY(0);
+}
+
+.notif-btn:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 0 12px #fff;
+}
+
+
+.clear-all-btn {
+    width: 100%;
+    padding: 8px 0;
+    margin-bottom: 10px;
+    border: none;
+    background: red;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.clear-all-btn:hover {
+    background: rgba(255, 46, 204, 0.35);
+    box-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* ===== FULL PAGE LAYOUT ===== */
+
+.landing-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    gap: 80px;
+    background: #000;
+}
+
+/* ===== LEFT SIDE IMAGE STACK (Like Instagram) ===== */
+
+.landing-left {
+    position: relative;
+    width: 380px;
+    height: 580px;
+}
+
+/* Frame around images (like a phone) */
+.image-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 38px;
+    overflow: hidden;
+    background: #000;
+    border: 2px solid #222;
+}
+
+/* All images stacked on top of each other */
+.slide-img {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.slide-img.active {
+    opacity: 1;
+}
+
+/* ===== RIGHT SIDE LOGIN AREA ===== */
+
+.landing-right {
+    width: 350px;
+    text-align: center;
+}
+
+.brand-title {
+    font-size: 50px;
+    margin-bottom: 30px;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 1px;
+}
+
+/* LOGIN BUTTON — same as normal .btn */
+/* LOGIN BUTTON — same as normal .btn */
+.btn-login {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: var(--neon-pink);
+    color: #000;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 0 10px var(--neon-pink);
+    text-decoration: none !important;  /* FIX underline */
+}
+
+/* REGISTER BUTTON */
+.btn-register {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    background: #222;
+    color: #ddd;
+    border: 1px solid #333;
+    font-weight: 600;
+    font-size: 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: 0.25s ease;
+    box-shadow: 0 0 10px rgba(255, 0, 120, 0.4);
+    text-decoration: none !important;  /* FIX underline */
+}
+
+
+.btn-login:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 14px var(--neon-hover);
+}
+
+
+.btn-register:hover {
+    background: #2c2c2c;
+    box-shadow: 0 0 14px rgba(255, 0, 120, 0.55); /* slightly stronger glow */
+}
+
+
+/* ===== FLOATING EMOJIS AROUND IMAGE FRAME ===== */
+
+.emoji {
+    position: absolute;
+    font-size: 32px;
+    opacity: 0.9;
+    animation: floatEmoji 4s ease-in-out infinite;
+    user-select: none;
+}
+
+/* Emoji Positions (adjust if you want) */
+.e1 { top: -20px; left: 20px; animation-delay: 0.2s; }
+.e2 { top: 50px; right: -30px; animation-delay: 0.7s; }
+.e3 { top: 60px; left: -25px; animation-delay: 1.1s; }
+.e4 { top: -10px; right: 10px; animation-delay: 0.5s; }
+.e5 { top: 180px; left: -35px; animation-delay: 1.5s; }
+
+
+/* Floating Animation */
+@keyframes floatEmoji {
+    0%   { transform: translateY(0) rotate(0deg); }
+    50%  { transform: translateY(-15px) rotate(10deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* ================================
+   3-LAYER OVERLAPPING IG STYLE
+================================*/
+
+.insta-left {
+    position: relative;
+    width: 380px;
+    height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Card Stack */
+.card-stack {
+    position: relative;
+    width: 320px;
+    height: 450px;
+}
+
+/* Card shape */
+.frame {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 0 25px rgba(0,0,0,0.6);
+}
+
+/* BACK CARD */
+.frame-back {
+    transform: rotate(-10deg) translate(-70px, 40px) scale(0.92);
+    transition: transform 0.4s ease;
+    animation: floatBack 4.2s ease-in-out infinite;
+}
+
+/* MID CARD */
+.frame-mid {
+    transform: rotate(10deg) translate(70px, 50px) scale(0.96);
+    transition: transform 0.4s ease;
+    animation: floatMid 3.8s ease-in-out infinite;
+}
+
+/* FRONT CARD */
+.frame-front {
+    transform: translateY(0) scale(1.05);
+    z-index: 10;
+    transition: transform 0.4s ease;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+    animation: floatFront 3.2s ease-in-out infinite;
+}
+
+/* FLOATING KEYFRAMES */
+@keyframes floatFront {
+    0% { transform: translateY(0) scale(1.05) }
+    50% { transform: translateY(-6px) scale(1.07) }
+    100% { transform: translateY(0) scale(1.05) }
+}
+
+@keyframes floatMid {
+    0% { transform: rotate(10deg) translate(70px,50px) }
+    50% { transform: rotate(10deg) translate(70px,46px) }
+    100% { transform: rotate(10deg) translate(70px,50px) }
+}
+
+@keyframes floatBack {
+    0% { transform: rotate(-10deg) translate(-70px,40px) }
+    50% { transform: rotate(-10deg) translate(-70px,44px) }
+    100% { transform: rotate(-10deg) translate(-70px,40px) }
+}
+
+
+/* Floating effect */
+@keyframes floatCard {
+    0% { transform: translateY(0px) scale(1.08); }
+    50% { transform: translateY(-12px) scale(1.12); }
+    100% { transform: translateY(0px) scale(1.08); }
+}
+
+
+/* Images inside cards */
+.frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* =============== SLIDESHOW (unchanged) =============== */
+
+.slide { display: none; }
+.slide.active { display: block; }
+
+/* ================================
+   FLOATING EMOJIS ABOVE CARDS
+================================*/
+
+.emoji {
+    position: absolute;
+    font-size: 36px;
+    z-index: 10; /* ensures emoji IS IN FRONT */
+    animation: float 3.5s ease-in-out infinite;
+    opacity: 0.9;
+}
+
+/* Emoji positions like Instagram */
+.e1 { top: -20px; left: 20px; animation-delay: 0.2s; }
+.e2 { top: 50px; right: -30px; animation-delay: 0.7s; }
+.e3 { top: 60px; left: -25px; animation-delay: 1.1s; }
+.e4 { top: -10px; right: 10px; animation-delay: 0.5s; }
+.e5 { top: 180px; left: -35px; animation-delay: 1.5s; }
+
+/* Emoji Animation */
+@keyframes float {
+    0% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-12px) rotate(8deg); }
+    100% { transform: translateY(0) rotate(0); }
+}
+.opening-images {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== BEHIND IMAGES ===== */
+.behind-img {
+    position: absolute;
+    width: 240px;
+    height: auto;
+    border-radius: 25px;
+    object-fit: cover;
+    opacity: 0.85;
+    filter: brightness(0.85);
+    z-index: 1;
+    transition: all 0.8s ease;
+}
+
+/* Left image */
+.behind-img.left {
+    transform: rotate(-12deg) translateX(-160px) translateY(20px);
+}
+
+/* Right image */
+.behind-img.right {
+    transform: rotate(12deg) translateX(160px) translateY(20px);
+}
+
+/* ===== FRONT IMAGE ===== */
+.front-img {
+    width: 280px;
+    border-radius: 30px;
+    z-index: 3;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    transform: translateY(0) scale(1);
+    transition: all 0.7s ease;
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Floating effect */
+@keyframes float {
+    0%   { transform: translateY(0px) scale(1); }
+    50%  { transform: translateY(-12px) scale(1.03); }
+    100% { transform: translateY(0px) scale(1); }
+}
+
+.card-stack:hover .frame-front {
+    transform: scale(1.08) translateY(-8px);
+}
+
+.card-stack:hover .frame-mid {
+    transform: rotate(10deg) translate(70px, 35px);
+}
+
+.card-stack:hover .frame-back {
+    transform: rotate(-10deg) translate(-70px, 25px);
+}
+
+.emoji {
+    position: absolute;
+    font-size: 36px;
+    opacity: 0.9;
+    z-index: 10;
+    animation: emojiFloat 4s ease-in-out infinite;
+    transition: 0.3s ease;
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+/* Glow stronger on hover */
+.emoji:hover {
+    transform: scale(1.2);
+    text-shadow: 0 0 14px var(--neon-hover);
+}
+
+/* FLOAT EMOJIS */
+@keyframes emojiFloat {
+    0% { transform: translateY(0) }
+    50% { transform: translateY(-10px) }
+    100% { transform: translateY(0) }
+}
+/*
+.frame:hover {
+    box-shadow: 0 0 25px rgba(255,0,180,0.9), 
+                0 0 45px rgba(255,0,180,0.6);
+    transform: scale(1.08) !important;
+    z-index: 99;
+} */
+
+.emoji {
+    position: absolute;
+    font-size: 32px;
+    opacity: 0.9;
+    animation: floatEmoji 4s ease-in-out infinite;
+    user-select: none;
+    z-index: 999 !important;    /* <-- ALWAYS above cards */
+    pointer-events: none;
+}
+
+.frame-front img.slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1.3s ease-in-out;
+}
+
+.frame-front img.active {
+    opacity: 1;
+}
+
+/* ============================
+   USER PROFILE PAGE
+============================= */
+
+.profile-wrapper {
+    max-width: 850px;
+    margin: 80px auto;
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+.profile-card {
+    background: rgba(10, 10, 10, 0.85);
+    border: 2px solid var(--neon-pink);
+    border-radius: 14px;
+    padding: 35px 40px;
+    box-shadow: 0 0 22px var(--neon-pink), inset 0 0 10px var(--neon-pink);
+    backdrop-filter: blur(10px);
+    animation: fadeIn 0.9s ease-out forwards;
+}
+
+.profile-title {
+    font-family: "Orbitron", sans-serif;
+    font-size: 32px;
+    color: var(--neon-pink);
+    text-align: center;
+    text-shadow: 0 0 15px var(--neon-pink);
+    margin-bottom: 25px;
+}
+
+.profile-details {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid rgba(255, 20, 147, 0.25);
+}
+
+.label {
+    font-weight: 600;
+    color: var(--neon-pink);
+    text-shadow: 0 0 6px var(--neon-pink);
+}
+
+.value {
+    font-weight: 400;
+    color: var(--soft-text);
+}
+
+/* Buttons */
+.profile-buttons {
+    margin-top: 35px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.neon-btn {
+    background: var(--neon-pink);
+    color: black !important;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 700;
+    width: auto;
+    font-size: 16px;
+    box-shadow: 0 0 16px var(--neon-pink);
+    transition: 0.25s ease;
+    text-decoration: none;
+}
+
+.neon-btn:hover {
+    background: var(--neon-hover);
+    box-shadow: 0 0 24px var(--neon-hover);
+    transform: translateY(-2px);
+}
+
+.neon-outline {
+    padding: 12px 24px;
+    border-radius: 10px;
+    width: auto;
+    text-decoration: none;
+    border: 2px solid var(--neon-pink);
+    color: var(--neon-pink) !important;
+    background: transparent;
+    font-weight: 700;
+    font-size: 16px;
+    text-shadow: 0 0 10px var(--neon-pink);
+    transition: 0.25s ease;
+}
+
+.neon-outline:hover {
+    background: var(--neon-pink);
+    color: black !important;
+    box-shadow: 0 0 25px var(--neon-pink);
+    transform: translateY(-2px);
+}
+
+
+
 
 

@@ -132,6 +132,89 @@
 </div>
 
     <hr>
+    <!--reviews-->
+<!-- REPLACE YOUR CURRENT REVIEWS SECTION WITH THIS SIMPLER VERSION -->
+
+<hr>
+
+<!-- Reviews Section -->
+<div class="card trip-tasks-card mb-5 p-3">
+    <h3 class="trip-section-title">⭐ Reviews ({{ trip.get_review_count() }})</h3>
+    
+    <div style="margin-top: 20px;">
+        {% if session.get('user_id') %}
+            {% set user_review = trip.reviews|selectattr('user_id', 'equalto', session.get('user_id'))|list|first %}
+            {% if user_review %}
+                <p style="color: #27ae60; font-weight: bold;">✅ You've already reviewed this trip</p>
+                <a href="{{ url_for('trips.edit_review', review_id=user_review.id) }}" 
+                   class="btn-link btn-tasks" 
+                   style="display: inline-block; padding: 12px 24px; margin-top: 10px;">
+                    Edit Your Review
+                </a>
+            {% else %}
+                <a href="{{ url_for('trips.add_review', trip_id=trip.id) }}" 
+                   class="btn-link btn-tasks" 
+                   style="display: inline-block; padding: 12px 24px; text-decoration: none;">
+                    ✍️ Write a Review
+                </a>
+            {% endif %}
+        {% else %}
+            <p style="color: #ccc;">Please log in to write a review</p>
+        {% endif %}
+    </div>
+
+    <div style="margin-top: 30px;">
+        {% if trip.reviews %}
+            <h4 style="color: var(--neon-cyan); margin-bottom: 20px;">Recent Reviews:</h4>
+            {% for review in trip.reviews[:3] %}
+            <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 0, 255, 0.2); margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, var(--neon-pink), var(--neon-cyan)); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">
+                        {{ review.user.username[0].upper() }}
+                    </div>
+                    <div>
+                        <strong style="color: #fff;">{{ review.user.username }}</strong>
+                        <div style="color: #f39c12; font-size: 1rem;">
+                            {{ '★' * review.rating }}{{ '☆' * (5 - review.rating) }}
+                        </div>
+                    </div>
+                </div>
+                
+                {% if review.comment %}
+                <p style="color: #ccc; margin: 10px 0;">
+                    {{ review.comment[:150] }}{% if review.comment|length > 150 %}...{% endif %}
+                </p>
+                {% endif %}
+                
+                {% if review.photos %}
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    {% for photo in review.photos[:3] %}
+                    <img src="{{ photo.photo_url }}" 
+                         alt="Review photo" 
+                         style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; border: 2px solid rgba(255, 0, 255, 0.3);">
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            
+            {% if trip.reviews|length > 3 %}
+            <a href="{{ url_for('trips.view_all_reviews') }}" 
+               class="btn-link btn-back" 
+               style="display: inline-block; margin-top: 15px;">
+                View all {{ trip.reviews|length }} reviews →
+            </a>
+            {% endif %}
+        {% else %}
+            <p style="color: #999; text-align: center; padding: 2rem; font-style: italic;">
+                No reviews yet. Be the first to share your experience!
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<hr>
+    
 
     <!-- Tasks -->
    
@@ -153,4 +236,197 @@
 
 
 </div>
+
+
+<style>
+/* Reviews Section Styles */
+.reviews-section {
+    margin: 2rem 0;
+}
+
+.reviews-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.reviews-header .trip-section-title {
+    margin: 0;
+}
+
+.average-rating {
+    text-align: right;
+}
+
+.rating-stars {
+    font-size: 1.5rem;
+    color: #f39c12;
+    margin-right: 0.5rem;
+}
+
+.rating-number {
+    color: var(--neon-cyan);
+    font-weight: bold;
+    text-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.user-review-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(39, 174, 96, 0.1);
+    border: 1px solid rgba(39, 174, 96, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.user-review-status p {
+    margin: 0;
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.btn-add-review {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-cyan) 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--neon-pink);
+}
+
+.btn-add-review:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px var(--neon-pink);
+    color: white;
+}
+
+.btn-add-review .icon {
+    font-size: 1.3rem;
+}
+
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-item {
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.review-item:hover {
+    transform: translateX(5px);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+}
+
+.review-user {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--neon-pink) 0%, var(--neon-cyan) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border: 2px solid var(--neon-cyan);
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+.review-stars {
+    color: #f39c12;
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
+.review-comment {
+    color: #ccc;
+    line-height: 1.6;
+    margin: 1rem 0;
+}
+
+.review-photos-mini {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+
+.review-photos-mini img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s;
+}
+
+.review-photos-mini img:hover {
+    transform: scale(1.05);
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 15px var(--neon-cyan);
+}
+
+.view-all-reviews {
+    display: inline-block;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.view-all-reviews:hover {
+    color: var(--neon-pink) !important;
+    text-shadow: 0 0 10px var(--neon-pink);
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 2rem;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .reviews-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .user-review-status {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+    
+    .btn-add-review {
+        width: 100%;
+        justify-content: center;
+    }
+}
+</style>
 {% endblock %}

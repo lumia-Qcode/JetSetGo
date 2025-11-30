@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% block title %}Edit Review{% endblock %}
+
+{% block content %}
+<div class="review-form-container">
+    <div class="form-header">
+        <h1>Edit Your Review</h1>
+        <p>Update your review for <strong>{{ review.trip.title }}</strong></p>
+    </div>
+
+    <form method="POST" action="{{ url_for('trips.edit_review', review_id=review.id) }}" enctype="multipart/form-data" class="review-form" onsubmit="console.log('Form submitting...'); return true;">
+        
+        <!-- Rating Section -->
+        <div class="form-group">
+            <label>Rating *</label>
+            <div class="star-rating">
+                <input type="radio" name="rating" value="5" id="star5" {% if review.rating == 5 %}checked{% endif %} required>
+                <label for="star5" title="5 stars">★</label>
+                
+                <input type="radio" name="rating" value="4" id="star4" {% if review.rating == 4 %}checked{% endif %}>
+                <label for="star4" title="4 stars">★</label>
+                
+                <input type="radio" name="rating" value="3" id="star3" {% if review.rating == 3 %}checked{% endif %}>
+                <label for="star3" title="3 stars">★</label>
+                
+                <input type="radio" name="rating" value="2" id="star2" {% if review.rating == 2 %}checked{% endif %}>
+                <label for="star2" title="2 stars">★</label>
+                
+                <input type="radio" name="rating" value="1" id="star1" {% if review.rating == 1 %}checked{% endif %}>
+                <label for="star1" title="1 star">★</label>
+            </div>
+        </div>
+
+        <!-- Comment Section -->
+        <div class="form-group">
+            <label for="comment">Your Review</label>
+            <textarea 
+                name="comment" 
+                id="comment" 
+                rows="6" 
+                placeholder="Tell us about your experience..."
+            >{{ review.comment or '' }}</textarea>
+        </div>
+
+        <!-- Existing Photos -->
+        {% if review.photos %}
+        <div class="form-group">
+            <label>Current Photos</label>
+            <div class="existing-photos">
+                {% for photo in review.photos %}
+                <div class="existing-photo-item">
+                    <img src="{{ photo.photo_url }}" alt="Review photo">
+                    <form method="POST" action="{{ url_for('trips.delete_review_photo', review_id=review.id, photo_id=photo.id) }}" style="display: inline;" onsubmit="return confirm('Delete this photo?');">
+                        <button type="submit" class="remove-photo">×</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Add More Photos Section -->
+        <div class="form-group">
+            <label for="photos">Add More Photos</label>
+            <div class="photo-upload-area" id="photoUploadArea">
+                <input 
+                    type="file" 
+                    name="photos" 
+                    id="photos" 
+                    accept="image/*" 
+                    multiple 
+                    style="display: none;"
+                >
+                <div class="upload-placeholder" onclick="document.getElementById('photos').click()">
+                    <div class="upload-icon">📷</div>
+                    <p>Click to add more photos</p>
+                    <span>You can upload multiple photos</span>
+                </div>
+                <div id="photoPreview" class="photo-preview"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <a href="{{ url_for('trips.view_all_reviews') }}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary" onclick="console.log('Button clicked');">Update Review</button>
+        </div>
+    </form>
+</div>
+
+<style>
+/* Container */
+.review-form-container {
+    max-width: 700px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #0b0b0b;
+    border-radius: 14px;
+    box-shadow:
+        0 0 20px rgba(255, 20, 147, 0.6),
+        0 0 45px rgba(255, 20, 147, 0.25),
+        inset 0 0 20px rgba(255, 20, 147, 0.15);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* Header */
+.form-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.form-header h1 {
+    font-size: 2.2rem;
+    color: #ff2ecc;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+    margin-bottom: 0.5rem;
+}
+.form-header p {
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+
+/* Form groups */
+.form-group {
+    margin-bottom: 2rem;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #ff5be0;
+    text-shadow: 0 0 4px #ff1493;
+}
+
+/* Star Rating */
+.star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 2.5rem;
+}
+.star-rating input { display: none; }
+.star-rating label {
+    cursor: pointer;
+    color: #555;
+    transition: 0.3s;
+    text-shadow: 0 0 2px #ff1493;
+}
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked ~ label {
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+
+/* Textarea */
+textarea {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid #ff1493;
+    border-radius: 10px;
+    background: #111;
+    color: #fff;
+    font-size: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    resize: vertical;
+    transition: 0.3s;
+}
+textarea:focus {
+    outline: none;
+    border-color: #ff5be0;
+    box-shadow: 0 0 8px #ff5be0;
+}
+
+/* Existing Photos */
+.existing-photos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+}
+.existing-photo-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.existing-photo-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px #ff2ecc, 0 0 24px #ff5be0;
+}
+.existing-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+/* Remove Photo Button */
+.remove-photo {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 20, 147, 0.8);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: background 0.3s, transform 0.2s;
+}
+.remove-photo:hover {
+    background: #ff5be0;
+    transform: scale(1.2);
+}
+
+/* Photo Upload Area */
+.photo-upload-area {
+    border: 2px dashed #ff1493;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    background: #0b0b0b;
+    transition: 0.3s;
+}
+.photo-upload-area:hover {
+    border-color: #ff5be0;
+    box-shadow: 0 0 12px #ff2ecc, 0 0 20px #ff5be0;
+}
+.upload-placeholder {
+    cursor: pointer;
+    color: #ff77ff;
+}
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 12px #ff5be0;
+}
+.upload-placeholder p, .upload-placeholder span {
+    color: #ff77ff;
+    text-shadow: 0 0 6px #ff5be0;
+}
+.photo-preview {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.photo-preview-item {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 1;
+}
+.photo-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 0 10px #ff2ecc, 0 0 20px #ff5be0;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #ff1493;
+}
+.btn-primary, .btn-secondary {
+    padding: 0.8rem 2rem;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s;
+}
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff5be0;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px #ff2ecc, 0 0 28px #ff5be0;
+}
+.btn-secondary {
+    background: #222;
+    color: #ff1493;
+    border: 1px solid #ff1493;
+    box-shadow: 0 0 6px #ff1493;
+}
+.btn-secondary:hover {
+    background: #ff1493;
+    color: #111;
+    box-shadow: 0 0 12px #ff5be0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .review-form-container { padding: 1rem; }
+    .review-form { padding: 1.5rem; }
+    .form-actions { flex-direction: column; }
+    .btn-primary, .btn-secondary { width: 100%; }
+}
+</style>
+
+
+<script>
+document.getElementById('photos').addEventListener('change', function(e) {
+    const preview = document.getElementById('photoPreview');
+    const placeholder = document.querySelector('.upload-placeholder');
+    const files = Array.from(e.target.files);
+    
+    if (files.length > 0) {
+        placeholder.style.display = 'none';
+        preview.innerHTML = '';
+        
+        files.forEach((file, index) => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'photo-preview-item';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview">
+                        <button type="button" class="remove-photo" onclick="removePhoto(${index})">×</button>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+});
+
+function removePhoto(index) {
+    const input = document.getElementById('photos');
+    const dt = new DataTransfer();
+    const files = Array.from(input.files);
+    
+    files.forEach((file, i) => {
+        if (i !== index) {
+            dt.items.add(file);
+        }
+    });
+    
+    input.files = dt.files;
+    
+    // Trigger change event to update preview
+    const event = new Event('change');
+    input.dispatchEvent(event);
+    
+    if (dt.files.length === 0) {
+        document.querySelector('.upload-placeholder').style.display = 'block';
+    }
+}
+</script>
+{% endblock %}

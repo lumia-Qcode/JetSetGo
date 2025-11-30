@@ -118,7 +118,7 @@ document.getElementById('plannedBudgetForm').addEventListener('submit', function
                 {% if expense.shared_users %}
                   <p class="mb-1">
                     Shared with: 
-                    {{ expense.shared_users | map(attribute='username') | join(', ') }} ({{ expense.status }})
+                    {{ expense.shared_users | map(attribute='username') | join(', ') }}
                   </p>
 
 

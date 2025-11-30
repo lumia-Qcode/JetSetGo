@@ -1,0 +1,460 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Page - JetSetGo{% endblock %}
+
+{% block content %}
+<div class="your-page-container">
+    <div class="your-page-header">
+        <h1>Your Page</h1>
+        <a href="{{ url_for('social.create_post') }}" class="btn btn-primary" style="text-decoration: none; width: auto;">
+            <i class="fas fa-plus"></i> New Post
+        </a>
+    </div>
+
+    <div class="posts-container">
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="post-user-info">
+                            <i class="fas fa-user-circle"></i>
+                            <div>
+                                <h3 style="color: #333;"><b>{{ post.user.username }}</b></h3>
+                                <span class="post-date">{{ post.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                            </div>
+                        </div>
+                        {% if post.user_id == session.get('user_id') %}
+                            <div class="post-actions">
+                                <a href="{{ url_for('social.edit_post', post_id=post.id) }}" class="btn-icon">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('social.delete_post', post_id=post.id) }}" style="display:inline;">
+                                    <button type="submit" class="btn-icon btn-danger" onclick="return confirm('Delete this post?')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    {% if post.image_url %}
+                        <div class="post-image">
+                            <img src="{{ post.image_url }}" alt="Post image" loading="lazy">
+                        </div>
+                    {% endif %}
+
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                    </div>
+
+                    <div class="post-interactions">
+                        <button class="like-btn" data-post-id="{{ post.id }}" onclick="toggleLike('{{ post.id }}')">
+                            <i class="fas fa-heart{% if user and post.is_liked_by(user) %} active{% endif %}"></i>
+                            <span class="like-count">{{ post.get_like_count() }}</span>
+                        </button>
+                        <button class="comment-btn" type="button" onclick="toggleCommentForm(this)">
+                            <i class="fas fa-comment"></i>
+                            <span class="comment-count">{{ post.comments|length }}</span>
+                        </button>
+                    </div>
+
+                    <div class="comments-section">
+                        {% if post.comments %}
+                            <div class="comments-list">
+                                {% for comment in post.comments %}
+                                    <div class="comment-item">
+                                        <div class="comment-header">
+                                            <div class="comment-user">
+                                                <i class="fas fa-user-circle"></i>
+                                                <strong>{{ comment.user.username }}</strong>
+                                                <span class="comment-date">{{ comment.created_at.strftime('%b %d, %Y') }}</span>
+                                            </div>
+                                            {% if comment.user_id == session.get('user_id') %}
+                                                <div class="comment-actions">
+                                                    <button class="btn-icon edit-comment-btn" type="button" data-comment-id="{{ comment.id }}" data-comment-content="{{ comment.content }}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form method="POST" action="{{ url_for('social.delete_comment', comment_id=comment.id) }}" style="display:inline;">
+                                                        <button type="submit" class="btn-icon btn-danger" onclick="return confirm('Delete this comment?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                        <p class="comment-content">{{ comment.content }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        {% if session.get('user_id') %}
+                            <form method="POST" action="{{ url_for('social.add_comment', post_id=post.id) }}" class="comment-form">
+                                <input type="text" id="comment_input_{{ post.id }}" name="comment_content" placeholder="Write a comment..." maxlength="1000">
+                                <div class="comment-form-actions">
+                                    <button type="submit" class="btn btn-small">Post</button>
+                                    <button type="button" class="btn btn-small-cancel" onclick="toggleCommentForm(this.closest('.post-card').querySelector('.comment-btn'))">Cancel</button>
+                                </div>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h3>No posts yet</h3>
+                <p>Be the first to share something amazing!</p>
+                <a href="{{ url_for('social.create_post') }}" class="btn btn-primary">Create Post</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+<style>
+.your-page-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    background: #0b0b0b;
+}
+
+/* Header */
+.your-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ff1493;
+}
+.your-page-header h1 {
+    font-size: 32px;
+    margin: 0;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+
+/* New Post Button */
+.btn-primary {
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 12px #ff1493, 0 0 24px #ff2ecc, 0 0 36px #ff5be0;
+}
+
+/* Flash Messages */
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+.alert-success { background: rgba(28,111,60,0.8); color: #fff; }
+.alert-danger  { background: rgba(140,28,28,0.8); color: #fff; }
+.alert-warning { background: rgba(28,62,111,0.8); color: #fff; }
+
+/* Posts Container */
+.posts-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Post Card */
+.post-card {
+    background: #0b0b0b;
+    border-radius: 12px;
+    box-shadow: 0 0 10px rgba(255,20,147,0.3);
+    overflow: hidden;
+    transition: 0.3s;
+}
+.post-card:hover {
+    box-shadow: 0 0 15px #ff1493, 0 0 30px #ff2ecc, 0 0 45px #ff5be0;
+}
+
+/* Post Header */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #ff1493;
+}
+.post-user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.post-user-info i {
+    font-size: 40px;
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.post-user-info h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #ff77ff;
+}
+.post-date {
+    font-size: 12px;
+    color: #ff77ff;
+}
+
+/* Post Actions Buttons */
+.post-actions {
+    display: flex;
+    gap: 10px;
+}
+.btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #ff1493;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+.btn-icon:hover {
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.btn-icon.btn-danger {
+    color: #ff1493;
+}
+.btn-icon.btn-danger:hover {
+    color: #ff2ecc;
+}
+
+/* Post Image */
+.post-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #0b0b0b;
+    max-width: 500px;
+    margin: 0 auto;
+    border-bottom: 1px solid #ff1493;
+}
+.post-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Post Content */
+.post-content {
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #fff;
+}
+.post-content p {
+    margin: 0;
+    word-wrap: break-word;
+}
+
+/* Post Interactions */
+.post-interactions {
+    display: flex;
+    gap: 20px;
+    padding: 12px 20px;
+    border-top: 1px solid #ff1493;
+    border-bottom: 1px solid #ff1493;
+}
+.like-btn, .comment-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ff77ff;
+    transition: color 0.3s, text-shadow 0.3s;
+}
+.like-btn:hover, .comment-btn:hover {
+    color: #ff2ecc;
+    text-shadow: 0 0 6px #ff2ecc, 0 0 12px #ff5be0;
+}
+.like-btn i.active {
+    color: #ff2ecc;
+}
+
+/* Comments Section */
+.comments-section {
+    padding: 16px 20px;
+}
+.comments-list {
+    margin-bottom: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+.comment-item {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ff1493;
+}
+.comment-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+.comment-user i {
+    color: #ff2ecc;
+}
+.comment-user strong {
+    color: #ff77ff;
+}
+.comment-date {
+    color: #ff77ff;
+}
+.comment-content {
+    margin: 0;
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Comment Form */
+.comment-form {
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+}
+.comment-form input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ff1493;
+    border-radius: 20px;
+    font-size: 14px;
+    background: #0b0b0b;
+    color: #fff;
+}
+.comment-form input:focus {
+    outline: none;
+    border-color: #ff5be0;
+    box-shadow: 0 0 8px #ff5be0, 0 0 12px #ff2ecc;
+}
+.btn-small {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ff1493 0%, #ff2ecc 50%, #ff5be0 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-small:hover {
+    box-shadow: 0 0 10px #ff1493, 0 0 20px #ff2ecc, 0 0 30px #ff5be0;
+}
+.btn-small-cancel {
+    padding: 8px 16px;
+    background: #222;
+    color: #ff1493;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.btn-small-cancel:hover {
+    background: #ff1493;
+    color: #0b0b0b;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ff77ff;
+}
+.empty-state i {
+    font-size: 64px;
+    margin-bottom: 20px;
+    color: #ff1493;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 16px #ff5be0;
+}
+.empty-state h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ff2ecc;
+}
+.empty-state p {
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .your-page-header h1 { font-size: 28px; }
+    .post-image { max-width: 100%; }
+}
+</style>
+
+
+<script>
+    function toggleLike(postId) {
+        const likeUrl = "{{ url_for('social.toggle_like', post_id=999) }}".replace('999', postId);
+        fetch(likeUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function toggleCommentForm(button) {
+        const postCard = button.closest('.post-card');
+        if (!postCard) return;
+        
+        const commentForm = postCard.querySelector('.comments-section form[method="POST"]');
+        if (!commentForm) return;
+        
+        if (commentForm.style.display === 'none' || commentForm.style.display === '') {
+            commentForm.style.display = 'flex';
+            const input = commentForm.querySelector('input');
+            if (input) input.focus();
+        } else {
+            commentForm.style.display = 'none';
+        }
+    }
+
+    function editComment(commentId, commentContent) {
+        const commentButton = document.querySelector(`[data-comment-id="${commentId}"]`);
+        const commentItem = commentButton.closest('.comment-item');
+        const contentPara = commentItem.querySelector('.comment-content');
+        
+        const escapedContent = commentContent.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        
+        contentPara.innerHTML = `<form method="POST" action="/social/comment/${commentId}/edit" class="comment-edit-form"><input type="text" name="comment_content" value="${escapedContent}" maxlength="1000" required><div class="comment-edit-actions"><button type="submit" class="btn-edit-save">Save</button><button type="button" class="btn-edit-cancel" onclick="location.reload()">Cancel</button></div></form>`;
+        
+        const input = contentPara.querySelector('input');
+        input.focus();
+        input.select();
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.edit-comment-btn')) {
+            const button = e.target.closest('.edit-comment-btn');
+            const commentId = button.dataset.commentId;
+            const commentContent = button.dataset.commentContent;
+            editComment(commentId, commentContent);
+        }
+    });
+</script>
+{% endblock %}
