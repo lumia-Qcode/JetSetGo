@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, url_for, flash, request, session, redirect, Flask
 from app.models import User, PasswordResetToken, UserStats
+from werkzeug.security import generate_password_hash
 from app import db
 
 auth_bp = Blueprint('auth', __name__)   # create Blueprint for auth routes
-app = Flask(__name__)   # Create Flask instance (used here only for session secret key — not typically needed in blueprints)
+app = Flask(__name__)   # Create Flask instance (used here only for session secret key – not typically needed in blueprints)
 app.secret_key = 'your-secret-key'  # The secret key ensures secure sessions and message flashing.
 
 #==========================================================================================================
@@ -60,51 +61,52 @@ def register():
     return render_template('register.html')
 
 #==========================================================================================================
+
 @auth_bp.route("/forgot_password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
+        # Step 1: Check if email exists
         email = request.form.get("email")
         user = User.query.filter_by(email=email).first()
-        if user:
-            token = PasswordResetToken.generate_token(user)
-            reset_url = url_for("auth.reset_password", token=token, _external=True)
-            
-            # Send email using your email service
-            print(f"Reset link for {user.email}: {reset_url}")
-            PasswordResetToken.send_email(user.email, "Reset Password", f"Click to reset: {reset_url}")
 
-        flash("If your email exists, a reset link has been sent.", "info")
-        return redirect(url_for("auth.login"))
+        if not user:
+            flash("Email not found.", "danger")
+            return redirect(url_for("auth_bp.forgot_password"))
+
+        # Store user ID in session to allow password reset
+        session["reset_user_id"] = user.id
+        return redirect(url_for("auth.reset_password"))
 
     return render_template("forgot_password.html")
 
 #===================================================================================================================
-@auth_bp.route("/reset_password/<token>", methods=["GET", "POST"])
-def reset_password(token):
-    reset_token = PasswordResetToken.query.filter_by(token=token).first_or_404()
 
-    if not reset_token.is_valid():
-        flash("Invalid or expired token.", "danger")
-        return redirect(url_for("auth.forgot_password"))
+@auth_bp.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    user_id = session.get("reset_user_id")
+    if not user_id:
+        flash("Unauthorized access.", "danger")
+        return redirect(url_for("auth_bp.forgot_password"))
 
+    user = User.query.get(user_id)
     if request.method == "POST":
         new_password = request.form.get("password")
         confirm_password = request.form.get("confirm_password")
 
         if new_password != confirm_password:
             flash("Passwords do not match.", "danger")
-            return redirect(url_for("auth.reset_password", token=token))
+            return redirect(url_for("auth.reset_password"))
 
-        try:
-            reset_token.reset_password(new_password)
-            flash("Password updated successfully!", "success")
-        except ValueError:
-            flash("Invalid or expired token.", "danger")
-            return redirect(url_for("auth.forgot_password"))
+        # Update password
+        user.password = generate_password_hash(new_password)
+        db.session.commit()
 
+        # Clear session
+        session.pop("reset_user_id", None)
+        flash("Password reset successful. Please login.", "success")
         return redirect(url_for("auth.login"))
 
-    return render_template("reset_password.html", token=token)
+    return render_template("reset_password.html")
 
 #==========================================================================================================
 @auth_bp.route("/profile")
@@ -118,21 +120,43 @@ def profile():
     return render_template("profile.html", user=user, user_stats=user_stats)
 
 #==========================================================================================================
+
 @auth_bp.route("/edit-profile", methods=["GET", "POST"])
 def edit_profile():
     if 'user_id' not in session:
         flash("Please log in to access your profile.", "danger")
         return redirect(url_for("auth.login"))
     
-    user =  User.query.get(session['user_id'])
+    user = User.query.get(session['user_id'])
 
     if request.method == "POST":
-        user.username = request.form["username"]
-        user.email = request.form["email"]
-        user.theme = request.form["theme"]
-
-        db.session.commit()
-        flash("Profile updated successfully!", "success")
-        return redirect(url_for("auth.profile"))
+        # Update user basic info
+        user.username = request.form.get("username")
+        user.email = request.form.get("email")
+        
+        # Get or create user stats
+        user_stats = UserStats.query.filter_by(user_id=user.id).first()
+        if not user_stats:
+            user_stats = UserStats(user_id=user.id)
+            db.session.add(user_stats)
+        
+        # Update theme in UserStats (NOT in User)
+        theme = request.form.get("theme", "dark")
+        user_stats.set_theme(theme)
+        
+        try:
+            db.session.commit()
+            
+            # Update session
+            session['user_theme'] = theme
+            session.modified = True
+            
+            flash("Profile updated successfully!", "success")
+            return redirect(url_for("auth.profile"))
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error updating profile: {e}")
+            flash("Error updating profile. Please try again.", "danger")
+            return redirect(url_for("auth.edit_profile"))
 
     return render_template("edit_profile.html", user=user)

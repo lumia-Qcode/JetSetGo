@@ -8,7 +8,7 @@
         <p>Update your review for <strong>{{ review.trip.title }}</strong></p>
     </div>
 
-    <form method="POST" action="{{ url_for('trips.edit_review', review_id=review.id) }}" enctype="multipart/form-data" class="review-form" onsubmit="console.log('Form submitting...'); return true;">
+    <form id="editReviewForm" method="POST" action="{{ url_for('trips.edit_review', review_id=review.id) }}" enctype="multipart/form-data" class="review-form">
         
         <!-- Rating Section -->
         <div class="form-group">
@@ -48,16 +48,17 @@
             <label>Current Photos</label>
             <div class="existing-photos">
                 {% for photo in review.photos %}
-                <div class="existing-photo-item">
+                <div class="existing-photo-item" data-photo-id="{{ photo.id }}">
                     <img src="{{ photo.photo_url }}" alt="Review photo">
-                    <form method="POST" action="{{ url_for('trips.delete_review_photo', review_id=review.id, photo_id=photo.id) }}" style="display: inline;" onsubmit="return confirm('Delete this photo?');">
-                        <button type="submit" class="remove-photo">×</button>
-                    </form>
+                    <button type="button" class="remove-photo" data-photo-id="{{ photo.id }}">×</button>
                 </div>
                 {% endfor %}
             </div>
         </div>
         {% endif %}
+
+        <!-- Hidden input for photos to delete -->
+        <input type="hidden" id="photosToDelete" name="photos_to_delete" value="">
 
         <!-- Add More Photos Section -->
         <div class="form-group">
@@ -83,7 +84,7 @@
         <!-- Action Buttons -->
         <div class="form-actions">
             <a href="{{ url_for('trips.view_all_reviews') }}" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary" onclick="console.log('Button clicked');">Update Review</button>
+            <button type="submit" class="btn-primary">Update Review</button>
         </div>
     </form>
 </div>
@@ -141,12 +142,15 @@
     gap: 0.5rem;
     font-size: 2.5rem;
 }
-.star-rating input { display: none; }
+.star-rating input {
+    display: none;
+}
 .star-rating label {
     cursor: pointer;
     color: #555;
     transition: 0.3s;
     text-shadow: 0 0 2px #ff1493;
+    margin: 0;
 }
 .star-rating label:hover,
 .star-rating label:hover ~ label,
@@ -167,6 +171,7 @@ textarea {
     font-family: 'Orbitron', sans-serif;
     resize: vertical;
     transition: 0.3s;
+    box-sizing: border-box;
 }
 textarea:focus {
     outline: none;
@@ -186,7 +191,11 @@ textarea:focus {
     overflow: hidden;
     aspect-ratio: 1;
     cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+.existing-photo-item.marked-for-deletion {
+    opacity: 0.5;
+    filter: grayscale(100%);
 }
 .existing-photo-item:hover {
     transform: scale(1.05);
@@ -214,6 +223,7 @@ textarea:focus {
     cursor: pointer;
     line-height: 1;
     transition: background 0.3s, transform 0.2s;
+    padding: 0;
 }
 .remove-photo:hover {
     background: #ff5be0;
@@ -242,9 +252,11 @@ textarea:focus {
     margin-bottom: 0.5rem;
     text-shadow: 0 0 8px #ff2ecc, 0 0 12px #ff5be0;
 }
-.upload-placeholder p, .upload-placeholder span {
+.upload-placeholder p,
+.upload-placeholder span {
     color: #ff77ff;
     text-shadow: 0 0 6px #ff5be0;
+    margin: 0.3rem 0;
 }
 .photo-preview {
     display: grid;
@@ -275,7 +287,8 @@ textarea:focus {
     padding-top: 1.5rem;
     border-top: 1px solid #ff1493;
 }
-.btn-primary, .btn-secondary {
+.btn-primary,
+.btn-secondary {
     padding: 0.8rem 2rem;
     border: none;
     border-radius: 10px;
@@ -308,15 +321,40 @@ textarea:focus {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .review-form-container { padding: 1rem; }
-    .review-form { padding: 1.5rem; }
-    .form-actions { flex-direction: column; }
-    .btn-primary, .btn-secondary { width: 100%; }
+    .review-form-container {
+        padding: 1rem;
+    }
+    .form-actions {
+        flex-direction: column;
+    }
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
 }
 </style>
 
-
 <script>
+let photosToDelete = [];
+
+// Handle existing photo remove buttons
+document.querySelectorAll('.existing-photo-item .remove-photo').forEach(button => {
+    button.addEventListener('click', function() {
+        const photoId = parseInt(this.getAttribute('data-photo-id'));
+        const photoItem = this.closest('.existing-photo-item');
+        photoItem.classList.toggle('marked-for-deletion');
+        
+        if (!photosToDelete.includes(photoId)) {
+            photosToDelete.push(photoId);
+        } else {
+            photosToDelete = photosToDelete.filter(id => id !== photoId);
+        }
+        
+        document.getElementById('photosToDelete').value = photosToDelete.join(',');
+    });
+});
+
+// Handle file selection for new photos
 document.getElementById('photos').addEventListener('change', function(e) {
     const preview = document.getElementById('photoPreview');
     const placeholder = document.querySelector('.upload-placeholder');
@@ -329,12 +367,12 @@ document.getElementById('photos').addEventListener('change', function(e) {
         files.forEach((file, index) => {
             if (file.type.startsWith('image/')) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function(result) {
                     const div = document.createElement('div');
                     div.className = 'photo-preview-item';
                     div.innerHTML = `
-                        <img src="${e.target.result}" alt="Preview">
-                        <button type="button" class="remove-photo" onclick="removePhoto(${index})">×</button>
+                        <img src="${result.target.result}" alt="Preview">
+                        <button type="button" class="remove-photo" onclick="removeNewPhoto(this)">×</button>
                     `;
                     preview.appendChild(div);
                 };
@@ -344,10 +382,14 @@ document.getElementById('photos').addEventListener('change', function(e) {
     }
 });
 
-function removePhoto(index) {
+// Remove new photo from preview
+function removeNewPhoto(button) {
     const input = document.getElementById('photos');
     const dt = new DataTransfer();
     const files = Array.from(input.files);
+    const previewItem = button.closest('.photo-preview-item');
+    const previewItems = document.querySelectorAll('.photo-preview-item');
+    const index = Array.from(previewItems).indexOf(previewItem);
     
     files.forEach((file, i) => {
         if (i !== index) {
@@ -365,5 +407,16 @@ function removePhoto(index) {
         document.querySelector('.upload-placeholder').style.display = 'block';
     }
 }
+
+// Validate form before submission
+document.getElementById('editReviewForm').addEventListener('submit', function(e) {
+    const rating = document.querySelector('input[name="rating"]:checked');
+    if (!rating) {
+        e.preventDefault();
+        alert('Please select a rating');
+        return false;
+    }
+    return true;
+});
 </script>
 {% endblock %}

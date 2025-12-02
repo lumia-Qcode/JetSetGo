@@ -75,6 +75,12 @@
             <a href="{{ url_for('trips.view_trips') }}" class="btn-primary">View Your Trips</a>
         </div>
     {% endif %}
+    
+    <div class="back-button-container" style="margin-top: 40px;">
+        <a href="{{ url_for('view.user_home') }}" class="btn back-button" style="text-decoration: none;">
+            <span class="arrow">←</span> Back to Home
+        </a>
+    </div>
 </div>
 
 <style>

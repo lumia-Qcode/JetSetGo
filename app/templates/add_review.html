@@ -5,7 +5,7 @@
 <div class="container mt-5" style="max-width: 700px;">
     <div class="card shadow p-4">
         <h2 class="text-center mb-4" style="color: var(--neon-pink); text-shadow: 0 0 10px var(--neon-pink);">
-            ✍️ Write a Review
+            Write a Review
         </h2>
         <p class="text-center mb-4" style="color: #ccc;">
             Share your experience for <strong style="color: var(--neon-cyan);">{{ trip.title }}</strong>
@@ -68,7 +68,7 @@
                     Post Review
                 </button>
                 <a href="{{ url_for('trips.trip_detail', trip_id=trip.id) }}" class="btn" style="flex: 1; padding: 12px 24px; background: transparent; color: var(--neon-pink); border: 2px solid var(--neon-pink); border-radius: 8px; font-weight: 600; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: all 0.3s;">
-                    Cancel
+                    Back
                 </a>
             </div>
         </form>

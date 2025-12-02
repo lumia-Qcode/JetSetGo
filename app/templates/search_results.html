@@ -7,13 +7,13 @@
 <div class="favorites-container">
 
     <div class="favorites-header">
-        <h1>🔍 Search Results for "{{ query }}"</h1>
-        <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary">← Back to Favorites</a>
+        <h1>Search Results for "{{ query }}"</h1>
+        <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary" style="width: auto;">← Back to Favorites</a>
     </div>
 
     <form action="{{ url_for('trips.search_favorites') }}" method="GET" class="search-bar">
         <input type="text" name="q" value="{{ query }}" class="search-input">
-        <button type="submit" class="btn btn-primary">Search</button>
+        <button type="submit" class="btn btn-primary" style="width: auto;">Search</button>
     </form>
 
     {% if results %}
@@ -56,5 +56,169 @@
     {% endif %}
 
 </div>
+     <a href="{{ url_for('trips.view_favorites') }}" class="btn btn-secondary" style="width: auto; text-decoration: none;">← Back to Favorites</a>
+
+<style>
+.favorites-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+    color: #ff77b7;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.favorites-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #ff2ecc;
+}
+
+.favorites-header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 8px #ff2ecc, 0 0 15px #ff77ff;
+}
+
+.favorites-header a.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #ff77ff;
+    text-decoration: none;
+    font-weight: 500;
+    border: 2px solid #ff2ecc;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.favorites-header a.btn:hover {
+    background: #ff2ecc;
+    color: #0d0d0d;
+    box-shadow: 0 0 15px #ff2ecc, 0 0 25px #ff77ff;
+}
+
+.search-bar {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid #ff2ecc;
+    background: #1a1a1a;
+    color: #ff77ff;
+    font-family: 'Orbitron', sans-serif;
+}
+
+.search-input::placeholder {
+    color: #ff77ff88;
+}
+
+.btn-primary {
+    background: #ff2ecc;
+    color: #0d0d0d;
+    border: 2px solid #ff2ecc;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px 16px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background: #ff77ff;
+    box-shadow: 0 0 15px #ff2ecc, 0 0 25px #ff77ff;
+}
+
+.favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.favorite-card {
+    background: #0d0d0d;
+    border: 2px solid #ff2ecc;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 0 10px #ff2ecc, 0 0 20px #ff77ff;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.favorite-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 0 20px #ff2ecc, 0 0 40px #ff77ff, 0 0 60px #ff2ecc;
+}
+
+.favorite-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    position: relative;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff2ecc;
+    font-size: 48px;
+}
+
+.favorite-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.favorite-content {
+    padding: 16px;
+}
+
+.favorite-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #ff2ecc;
+}
+
+.favorite-country {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #ff77ff;
+}
+
+.favorite-description {
+    font-size: 14px;
+    color: #ff77ffaa;
+    line-height: 1.5;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #ff77ff77;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.empty-state h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #ff2ecc;
+}
+
+.empty-state p {
+    color: #ff77ffaa;
+}
+</style>
+
 
 {% endblock %}

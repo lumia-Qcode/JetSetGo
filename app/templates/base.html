@@ -1,14 +1,57 @@
+<!-- BASE.HTML - CORRECTED WITH THEME SYSTEM -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}ORDIVA{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- THEME CSS VARIABLES -->
+    <style>
+        :root {
+            --bg-primary: #0d0d0d;
+            --bg-secondary: #1a1a1a;
+        }
 
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        /* Light Theme - ONLY changes background */
+        body.light-theme {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+        }
+
+        body {
+            background: var(--bg-primary);
+            transition: background 0.4s ease;
+        }
+
+        main {
+            background: var(--bg-primary);
+        }
+
+        html, body {
+            background: var(--bg-primary);
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+
 <body>
+
+<!-- GLOBAL THEME LOADER - Load theme from database/localStorage -->
+<script>
+    (function() {
+        const userTheme = localStorage.getItem('userTheme') || 'dark';
+        if (userTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+            document.body.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+            document.body.classList.remove('light-theme');
+        }
+    })();
+</script>
+
 <header>
     <div class="container nav-container">
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="JetSetGo Logo" class="logo">
@@ -83,8 +126,6 @@
     </div>
 </header>
 
-
-
 <main class="container">
     {% with messages = get_flashed_messages(with_categories=True) %}
         {% for category, message in messages %}
@@ -95,15 +136,11 @@
     {% block content %}{% endblock %}
 </main>
 
-
-
 <footer>
     <div class="container">
         <p>&copy; {{ 2025 }} JetSetGo Travel Planner</p>
     </div>
 </footer>
-
-
 
 <canvas id="particles"></canvas>
 
@@ -171,9 +208,7 @@ setInterval(() => {
 }, 2500);
 </script>
 
-
 <style>
-    /* EXPLORE LINK STYLING */
     .nav-explore {
         color: white;
         text-decoration: none;
@@ -188,7 +223,6 @@ setInterval(() => {
         transform: scale(1.05);
     }
 
-    /* USER DROPDOWN STYLING */
     .user-dropdown-wrapper {
         position: relative;
         display: inline-block;
@@ -226,67 +260,56 @@ setInterval(() => {
         transform: rotate(180deg);
     }
 
- 
+    .user-dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 110%;
+        background: #0b0b0b;
+        border: 1px solid #ff1493;
+        border-radius: 8px;
+        min-width: 180px;
+        z-index: 100;
+        flex-direction: column;
+    }
 
-/* Dropdown Menu */
-.user-dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 110%;
-    background: #0b0b0b;
-    border: 1px solid #ff1493;
-    border-radius: 8px;
-    min-width: 180px;
-    z-index: 100;
-    flex-direction: column;
-}
+    .user-dropdown-wrapper:hover .user-dropdown-menu {
+        display: flex;
+    }
 
-/* Show Menu on Hover */
-.user-dropdown-wrapper:hover .user-dropdown-menu {
-    display: flex;
-}
+    .user-dropdown-menu .dropdown-item {
+        padding: 10px 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #ff77ff;
+        text-decoration: none;
+        font-size: 13px;
+        transition: background 0.2s, color 0.2s;
+    }
 
-/* Dropdown Items */
-.user-dropdown-menu .dropdown-item {
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #ff77ff;
-    text-decoration: none;
-    font-size: 13px;
-    transition: background 0.2s, color 0.2s;
-}
+    .user-dropdown-menu .dropdown-item i {
+        font-size: 14px;
+        color: #ff2ecc;
+    }
 
-.user-dropdown-menu .dropdown-item i {
-    font-size: 14px;
-    color: #ff2ecc;
-}
+    .user-dropdown-menu .dropdown-item:hover {
+        color: white;
+    }
 
-.user-dropdown-menu .dropdown-item:hover {
-    color: white;
-}
+    .dropdown-divider {
+        height: 1px;
+        margin: 3px 0;
+        background: rgba(255, 20, 147, 0.2);
+    }
 
-/* Divider */
-.dropdown-divider {
-    height: 1px;
-    margin: 3px 0;
-    background: rgba(255, 20, 147, 0.2);
-}
-
-/* Logout Item Highlight */
-.logout-item {
-    font-weight: 600;
-}
-</style>
-
+    .logout-item {
+        font-weight: 600;
+    }
 </style>
 
 <!-- NOTIFICATION SYSTEM -->
 <script>
-
-// Toggle notification dropdown
 document.getElementById("notifBell").addEventListener("click", (e) => {
     e.stopPropagation();
     const dd = document.getElementById("notifDropdown");
@@ -294,7 +317,6 @@ document.getElementById("notifBell").addEventListener("click", (e) => {
     loadNotifications();
 });
 
-// Close dropdown on outside click
 document.addEventListener("click", (e) => {
     const wrap = document.querySelector(".notif-wrapper");
     const userDropdown = document.querySelector(".user-dropdown-wrapper");
@@ -308,7 +330,6 @@ document.addEventListener("click", (e) => {
     }
 });
 
-// Load unread count
 function loadUnreadCount() {
     fetch("/notifications/unread_count")
         .then(res => res.json())
@@ -323,7 +344,6 @@ function loadUnreadCount() {
         });
 }
 
-// Load notifications list
 function loadNotifications() {
     fetch("/notifications/list")
         .then(res => res.json())
@@ -381,8 +401,6 @@ function loadNotifications() {
         });
 }
 
-
-// MARK READ (auto called)
 function markRead(id) {
     fetch(`/notifications/mark_read/${id}`, {
         method: "POST"
@@ -421,8 +439,6 @@ function denyTrip(notifId, tripId) {
     });
 }
 
-
-// EXPENSE ACCEPT
 function acceptExpense(notifId, expenseId) {
     fetch("/notifications/respond_expense", {
         method: "POST",
@@ -439,7 +455,6 @@ function acceptExpense(notifId, expenseId) {
     });
 }
 
-// EXPENSE DENY
 function denyExpense(notifId, expenseId) {
     fetch("/notifications/respond_expense", {
         method: "POST",
@@ -455,7 +470,6 @@ function denyExpense(notifId, expenseId) {
         removeNotificationFromUI(notifId);
     });
 }
-
 
 function removeNotificationFromUI(id) {
     const el = document.querySelector(`.notif-item[data-id='${id}']`);
@@ -484,10 +498,10 @@ document.getElementById("clearAllBtn").addEventListener("click", () => {
     });
 });
 
-
 setInterval(loadUnreadCount, 5000);
 loadUnreadCount();
-
 </script>
+
 </body>
+{% block scripts %}{% endblock %}
 </html>

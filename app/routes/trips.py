@@ -1027,6 +1027,26 @@ def edit_review(review_id):
         try:
             review.update(rating=rating, comment=comment)
             
+            # Handle photo deletion (photos_to_delete comes from the hidden input)
+            photos_to_delete = request.form.get('photos_to_delete', '')
+            if photos_to_delete:
+                photo_ids = [int(pid) for pid in photos_to_delete.split(',') if pid.strip()]
+                for photo_id in photo_ids:
+                    photo = ReviewPhoto.query.get(photo_id)
+                    if photo and photo.review_id == review_id:
+                        try:
+                            # Delete photo from filesystem
+                            photo_path = os.path.join('app', photo.photo_url.lstrip('/'))
+                            if os.path.exists(photo_path):
+                                os.remove(photo_path)
+                        except Exception as e:
+                            print(f"Error deleting photo file: {e}")
+                        
+                        # Delete photo record from database
+                        db.session.delete(photo)
+                
+                db.session.commit()
+            
             # Handle new photo uploads
             if 'photos' in request.files:
                 files = request.files.getlist('photos')
@@ -1048,11 +1068,15 @@ def edit_review(review_id):
             return redirect(url_for("trips.view_all_reviews"))
 
         except ValueError as e:
+            db.session.rollback()
             flash(str(e), "danger")
+            return redirect(url_for("trips.edit_review", review_id=review_id))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"Error updating review: {str(e)}", "danger")
             return redirect(url_for("trips.edit_review", review_id=review_id))
 
     return render_template("edit_review.html", review=review)
-
 #==========================================================================================================
 
 @trips_bp.route("/review/<int:review_id>/delete", methods=["POST"])

@@ -80,7 +80,7 @@
 
         <!-- Badge Thresholds -->
         <div class="badge-thresholds">
-            <h3>📊 Badge Milestones</h3>
+            <h3>Badge Milestones</h3>
             <div class="threshold-list">
                 <div class="threshold-item {% if user_stats.tasks_completed >= 5 %}completed{% endif %}">
                     <span class="threshold-icon">🎯</span>
@@ -195,6 +195,24 @@
     color: #ff77ff;
     text-shadow: 0 0 4px #ff5be0;
 }
+
+.progress-bar {
+    width: 100%;
+    height: 25px;
+    background-color: #ddd;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%; /* initial width, JS will set it */
+    background: linear-gradient(90deg, #ff6ec4, #7873f5); /* stylish gradient */
+    border-radius: 12px 0 0 12px;
+    transition: width 1s ease-in-out;
+}
+
 
 /* Progress Section */
 .progress-section {
@@ -440,13 +458,19 @@
 }
 </style>
 
-
+{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.progress-fill').forEach(function(el) {
-            var p = parseInt(el.getAttribute('data-progress')) || 0;
-            el.style.width = p + '%';
-        });
-    });
+document.addEventListener("DOMContentLoaded", () => {
+    const progressFill = document.querySelector(".progress-fill");
+    if (progressFill) {
+        // Get the percentage from the data attribute
+        const progressPercent = progressFill.getAttribute("data-progress");
+        // Animate width
+        progressFill.style.width = progressPercent + "%";
+    }
+});
 </script>
+{% endblock %}
+
+
 {% endblock %}

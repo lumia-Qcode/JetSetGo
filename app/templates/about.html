@@ -1,22 +1,44 @@
 {% extends 'base.html' %}
-{% block title %}About Us{% endblock %}
+{% block title %}About JetSetGo{% endblock %}
 
 {% block content %}
-<div class="about-card">
-  <h2>About Ordiva To-Do App</h2>
-  <p>
-    This website was designed and developed by <strong>Lumia Qureshi</strong> using the Flask framework.
-  </p>
-  <p>
-    Ordiva is a simple yet powerful task management app that helps you organize your daily activities efficiently.
-  </p>
-  <h3>Features</h3>
-  <ul>
-    <li>Add, update, and delete your tasks easily.</li>
-    <li>Set due dates and times to stay on track.</li>
-    <li>Track task status: Pending, Working, Done.</li>
-    <li>User authentication for personalized task management.</li>
-    <li>Responsive and clean interface for all devices.</li>
-  </ul>
+<div class="about-card-wrapper">
+    <div class="about-card">
+        <h1>JetSetGo</h1>
+        <p class="subtitle">Created by Lumia Qureshi, Alizeh Awan, and Eman Naeem</p>
+
+        <h2>Features</h2>
+        <ul>
+            <li>🧳 <strong>Travel Checklists</strong> – Organize what to pack and tasks to do</li>
+            <li>✈️ <strong>Trip Planning</strong> – Plan destinations, dates, and activities</li>
+            <li>💸 <strong>Budgeting</strong> – Track expenses for each trip</li>
+            <li>📅 <strong>Itinerary Planning</strong> – Daily travel schedule organization</li>
+            <li>🤝 <strong>Expense Sharing</strong> – Split costs with friends</li>
+            <li>🎮 <strong>Gamification</strong> – Earn badges and XP for tasks</li>
+            <li>📢 <strong>Posting & Reviews</strong> – Share experiences and reviews</li>
+            <li>🌍 <strong>Popular Destinations</strong> – Discover top spots and hidden gems</li>
+        </ul>
+
+        <h2>Meet the Team</h2>
+        <ul>
+            <li><strong>Lumia Qureshi</strong> – Frontend & Backend Development</li>
+            <li><strong>Alizeh Awan</strong> – UX/UI & Design</li>
+            <li><strong>Eman Naeem</strong> – System Notifications & Backend Features</li>
+        </ul>
+    </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Optional: Add subtle interactive hover effect
+  const card = document.querySelector(".about-card");
+  card.addEventListener("mousemove", e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', x + 'px');
+      card.style.setProperty('--mouse-y', y + 'px');
+  });
+</script>
 {% endblock %}

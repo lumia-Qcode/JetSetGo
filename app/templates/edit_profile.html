@@ -1,3 +1,4 @@
+<!-- EDIT_PROFILE.HTML - CORRECTED THEME SYSTEM -->
 {% extends "base.html" %}
 
 {% block title %}Edit Profile{% endblock %}
@@ -27,13 +28,21 @@
                     <input type="email" name="email" class="edit-input" value="{{ user.email }}" required>
                 </div>
 
-                <!-- Theme -->
+                <!-- Theme Selection -->
                 <div class="edit-row">
-                    <label class="edit-label">Theme</label>
-                    <select name="theme" class="edit-input">
-                        <option value="dark" {% if user.theme == 'dark' %}selected{% endif %}>Dark Cyber</option>
-                        <option value="light" {% if user.theme == 'light' %}selected{% endif %}>Light Mode</option>
-                    </select>
+                    <label class="edit-label">Choose Your Theme</label>
+                    <div class="theme-selector">
+                        <div class="theme-option" data-theme="dark">
+                            <div class="theme-preview dark-preview"></div>
+                            <span class="theme-name">Dark Cyber</span>
+                        </div>
+
+                        <div class="theme-option" data-theme="light">
+                            <div class="theme-preview light-preview"></div>
+                            <span class="theme-name">Light Mode</span>
+                        </div>
+                    </div>
+                    <input type="hidden" name="theme" id="themeInput" value="{{ user.stats.theme }}">
                 </div>
 
             </div>
@@ -51,47 +60,223 @@
 </div>
 
 <style>
-   
+.profile-wrapper {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.profile-card {
+    background: rgba(15, 15, 15, 0.8);
+    border: 2px solid #ff2ecc;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 0 20px #ff2ecc, inset 0 0 10px rgba(255, 46, 204, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.profile-title {
+    font-size: 28px;
+    color: #ff2ecc;
+    text-shadow: 0 0 10px #ff2ecc;
+    margin-bottom: 30px;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+}
 
 .edit-fields {
     margin-top: 20px;
 }
 
 .edit-row {
-    margin-bottom: 22px;
+    margin-bottom: 30px;
     display: flex;
     flex-direction: column;
 }
 
 .edit-label {
-    color: var(--neon-pink);
-    font-weight: 600;
-    margin-bottom: 6px;
-    text-shadow: 0 0 6px var(--neon-pink);
+    color: #ff2ecc;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 6px #ff2ecc;
+    font-family: 'Orbitron', sans-serif;
 }
 
 .edit-input {
     padding: 12px 14px;
-    background: #0a0a0a;
-    border: 1px solid rgba(255, 20, 147, 0.3);
-    border-radius: 8px;
-    color: var(--text-color);
-    transition: 0.25s ease;
+    background: #1a1a1a;
+    border: 2px solid #ff2ecc;
+    border-radius: 10px;
+    color: #ffffff;
+    transition: 0.3s ease;
+    font-size: 14px;
+    font-family: inherit;
 }
 
 .edit-input:focus {
-    border-color: var(--neon-pink);
-    box-shadow: 0 0 12px var(--neon-pink);
+    border-color: #ff1493;
+    box-shadow: 0 0 12px #ff2ecc;
+    outline: none;
 }
 
-.edit-input-file {
-    padding: 10px;
-    background: #111;
-    border: 1px solid rgba(255, 20, 147, 0.3);
+/* Theme Selector */
+.theme-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.theme-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 46, 204, 0.05);
+}
+
+.theme-option:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(255, 46, 204, 0.2);
+}
+
+.theme-option[data-selected="true"] {
+    border-color: #ff2ecc;
+    box-shadow: 0 0 16px #ff2ecc;
+    background: rgba(255, 46, 204, 0.1);
+}
+
+.theme-preview {
+    width: 60px;
+    height: 60px;
     border-radius: 8px;
-    color: var(--soft-text);
+    box-shadow: 0 0 12px currentColor;
+    transition: all 0.3s ease;
 }
 
+.dark-preview {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1b3d 100%);
+    box-shadow: 0 0 12px #ff2ecc;
+}
+
+.light-preview {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    box-shadow: 0 0 12px #333;
+}
+
+.theme-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #b0b0b0;
+    text-align: center;
+}
+
+.profile-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+    border: 2px solid #ff2ecc;
+    cursor: pointer;
+    background: transparent;
+    color: #ffffff;
+}
+
+.neon-btn {
+    background: linear-gradient(135deg, #ff2ecc, #ff1493);
+    color: white;
+    box-shadow: 0 0 15px #ff2ecc;
+}
+
+.neon-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px #ff1493;
+}
+
+.neon-outline {
+    background: transparent;
+    color: #ff2ecc;
+    box-shadow: 0 0 10px #ff2ecc;
+}
+
+.neon-outline:hover {
+    background: rgba(255, 46, 204, 0.1);
+    box-shadow: 0 0 20px #ff1493;
+}
+
+@media (max-width: 768px) {
+    .theme-selector {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .profile-buttons {
+        flex-direction: column;
+    }
+}
 </style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const themeInput = document.getElementById('themeInput');
+    const themeOptions = document.querySelectorAll('.theme-option');
+    const currentTheme = "{{ user.stats.theme }}";
+
+    // Apply theme - ONLY changes background
+    function applyTheme(theme) {
+        if (theme === "light") {
+            document.documentElement.classList.add('light-theme');
+            document.body.classList.add('light-theme');
+        } else {
+            document.documentElement.classList.remove('light-theme');
+            document.body.classList.remove('light-theme');
+        }
+        localStorage.setItem('userTheme', theme);
+    }
+
+    // Apply theme on page load
+    applyTheme(currentTheme);
+
+    // Mark current theme as selected
+    themeOptions.forEach(option => {
+        const optionTheme = option.getAttribute('data-theme');
+        if (optionTheme === currentTheme) {
+            option.setAttribute('data-selected', 'true');
+        } else {
+            option.setAttribute('data-selected', 'false');
+        }
+    });
+
+    // Click handler for theme options
+    themeOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            // Remove selected from all
+            themeOptions.forEach(o => o.setAttribute('data-selected', 'false'));
+            
+            // Add selected to clicked
+            option.setAttribute('data-selected', 'true');
+
+            // Get selected theme
+            const selectedTheme = option.getAttribute('data-theme');
+            themeInput.value = selectedTheme;
+            applyTheme(selectedTheme);
+        });
+    });
+});
+</script>
 
 {% endblock %}

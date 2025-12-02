@@ -1,3 +1,4 @@
+<!-- PROFILE.HTML - CORRECTED -->
 {% extends "base.html" %}
 
 {% block title %}User Profile{% endblock %}
@@ -39,7 +40,7 @@
 
             <div class="detail-row">
                 <span class="label">Member Since:</span>
-                <span class="value">{{ user_stats.created_at.strftime("%b %d, %Y — %I:%M %p") }}</span>
+                <span class="value">{{ user_stats.created_at.strftime("%b %d, %Y – %I:%M %p") }}</span>
             </div>
 
         </div>
@@ -52,5 +53,118 @@
     </div>
 
 </div>
+
+<style>
+.profile-wrapper {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.profile-card {
+    background: rgba(15, 15, 15, 0.8);
+    border: 2px solid #ff2ecc;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 0 20px #ff2ecc, inset 0 0 10px rgba(255, 46, 204, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.profile-title {
+    font-size: 28px;
+    color: #ff2ecc;
+    text-shadow: 0 0 10px #ff2ecc;
+    margin-bottom: 30px;
+    font-family: 'Orbitron', sans-serif;
+    text-align: center;
+}
+
+.profile-details {
+    margin: 20px 0;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 46, 204, 0.2);
+    color: #ffffff;
+}
+
+.label {
+    font-weight: 600;
+    color: #ff2ecc;
+}
+
+.value {
+    color: #ffffff;
+}
+
+.profile-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: 700;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+    border: 2px solid #ff2ecc;
+    cursor: pointer;
+    background: transparent;
+    color: #ffffff;
+}
+
+.neon-btn {
+    background: linear-gradient(135deg, #ff2ecc, #ff1493);
+    color: white;
+    box-shadow: 0 0 15px #ff2ecc;
+}
+
+.neon-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 25px #ff1493;
+}
+
+.neon-outline {
+    background: transparent;
+    color: #ff2ecc;
+    box-shadow: 0 0 10px #ff2ecc;
+}
+
+.neon-outline:hover {
+    background: rgba(255, 46, 204, 0.1);
+    box-shadow: 0 0 20px #ff1493;
+}
+
+@media (max-width: 768px) {
+    .profile-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+
+<!-- THEME APPLICATION SCRIPT -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const theme = "{{ user_stats.theme }}";
+    
+    if (theme === "light") {
+        document.documentElement.classList.add('light-theme');
+        document.body.classList.add('light-theme');
+    } else {
+        document.documentElement.classList.remove('light-theme');
+        document.body.classList.remove('light-theme');
+    }
+    
+    localStorage.setItem('userTheme', theme);
+});
+</script>
 
 {% endblock %}
